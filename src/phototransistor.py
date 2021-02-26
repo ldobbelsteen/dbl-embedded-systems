@@ -1,4 +1,5 @@
 import Adafruit_MCP3008
+from constants import Constants
 
 
 class Phototransistor:
@@ -31,4 +32,4 @@ class Phototransistor:
     @staticmethod
     def get_color(reading: float):
         reading = Phototransistor.__value_to_fraction(reading) * 100
-        return 0 if reading > 35 else 1
+        return 0 if reading > Constants.WHITE_VALUE else 1
