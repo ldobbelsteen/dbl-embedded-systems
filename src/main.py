@@ -34,9 +34,12 @@ if __name__ == '__main__':
 
     # Test phototransistor
     photo = phototransistor.Phototransistor(14, 15, 18, 23)
-    while True:
-        channel = 0
-        light = photo.get_reading(channel)
-        percentage = round(light * 100, 1)
-        print(str(percentage) + "%")
-        time.sleep(0.5)
+    # while True:
+    #     channel = 0
+    #     light = photo.get_reading(channel)
+    #     percentage = round(light * 100, 1)
+    #     print(str(percentage) + "%")
+    #     time.sleep(0.5)
+
+    reading = photo.get_reading(5)
+    color = photo.get_color(reading)

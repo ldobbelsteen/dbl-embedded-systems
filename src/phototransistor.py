@@ -1,5 +1,5 @@
-import Adafruit_GPIO.SPI as SPI
 import Adafruit_MCP3008
+
 
 class Phototransistor:
     __mcp = None
@@ -13,22 +13,22 @@ class Phototransistor:
     def get_reading(self, channel: int):
         if self.__loaded:
             value = self.__mcp.read_adc(channel)
-            return self.__value_to_fraction(value)
+            return value
         return -1
 
     def get_reading_difference(self, channel: int):
         if self.__loaded:
             value = self.__mcp.read_adc_difference(channel)
-            return self.__value_to_fraction(value)
+            return value
         return -1
-    
-    def __value_to_fraction(self, value: int):
+
+    @staticmethod
+    def __value_to_fraction(value: float):
         return round(value / 1024, 3)
 
     # Requires: making sure that there is constant a physical light on it, such that the brightness percentage is constant.
     # only returns the brightness
-    def get_color(self, channel: int):
-        if self.__loaded:
-            value = self.__value_to_fraction(self.__mcp.read_adc(channel)) * 100
-            return 0 if value > 35 else 1
-        return -1
+    @staticmethod
+    def get_color(reading: float):
+        reading = Phototransistor.__value_to_fraction(reading) * 100
+        return 0 if reading > 35 else 1

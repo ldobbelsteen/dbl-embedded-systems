@@ -1,30 +1,31 @@
 import unittest
 
-from phototransistor import get_reading
+from src import phototransistor
 
 
 class TestSum(unittest.TestCase):
+    __photo = phototransistor.Phototransistor
+
     def test_list_black(self):
         """
         Test that it gives white by white insertion of brightness.
         """
-        result = get_reading(data)
+        result = self.__photo.get_color(358.5)
         self.assertEqual(result, 1)
 
     def test_list_white(self):
         """
         Test that it gives black by insertion of black percentage brightness.
         """
-        result = get_reading(data)
+        result = self.__photo.get_color(358.3)
         self.assertEqual(result, 0)
 
     def test_list_white(self):
         """
         Test that it gives none by insertion of brightness mediate.
         """
-        result = get_reading(self, channel: int)
+        result = self.__photo.get_color(358.4)
         self.assertEqual(result, 0)
-
 
 
 if __name__ == '__main__':

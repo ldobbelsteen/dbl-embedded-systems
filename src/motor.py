@@ -1,6 +1,8 @@
 import RPi.GPIO as GPIO
 from time import sleep
+
 GPIO.setmode(GPIO.BCM)
+
 
 class Motor:
     __forward_pin = -1
@@ -21,33 +23,33 @@ class Motor:
             GPIO.setup(self.__enable_pin, GPIO.OUT)
 
             self.__pwm = GPIO.PWM(self.__enable_pin, 100)
-            self.__pwm.start(0)
 
     def change(self, forward: bool, power: int):
         if self.__loaded:
-            power = self.__power_check(power)
+            power = self.__power_check()
             self.stop()
             GPIO.output(self.__forward_pin, forward)
             GPIO.output(self.__backward_pin, not forward)
-            self.__start(power)
-    
+            self.start(power)
+
     def change_w_dur(self, forward: bool, power: int, duration: int):
         if self.__loaded:
             self.change(forward, power)
             sleep(duration)
             self.stop()
 
-    def __power_check(self, power: int):
-        if power < 0:
-            return 0
-        elif power > 100:
-            return 100
-        return power
-    
-    def __start(self, power):
+    def start(self, power):
         if self.__loaded:
             self.__pwm.start(power)
 
     def stop(self):
         if self.__loaded:
             self.__pwm.stop()
+
+    @staticmethod
+    def __power_check(power: int):
+        if power < 0:
+            return 0
+        elif power > 100:
+            return 100
+        return power
