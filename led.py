@@ -7,11 +7,14 @@ class Led:
     
     def __init__(self, led_pin: int = -1):
         self.__loaded = led_pin > -1
+        self.__led_pin = led_pin
         if self.__loaded:
             GPIO.setup(led_pin, GPIO.OUT)
 
     def on(self):
-        GPIO.output(self.__led_pin, 1)
+        if self.__loaded:
+            GPIO.output(self.__led_pin, 1)
 
     def off(self):
-        GPIO.output(self.__led_pin, 0)
+        if self.__loaded:
+            GPIO.output(self.__led_pin, 0)

@@ -24,10 +24,10 @@ if __name__ == '__main__':
     motor2.stop()
 
     # Test controlling light
-    #led1 = led.Led(26)
-    #led1.on()
-    #time.sleep(1)
-    #led1.off()
+    led1 = led.Led(26)
+    led1.on()
+    time.sleep(1)
+    led1.off()
 
     # Clean GPIO channels
     GPIO.cleanup()
