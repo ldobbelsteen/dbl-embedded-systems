@@ -1,9 +1,34 @@
-import RPi.GPIO as GPIO
+import time
+import motor
+from constants import Constants
 
 
 class Robot:
-    def __init__(self):
+    __motor = None
+    __switch_arrival = None
+    __switch_start = None
+
+    def __init__(self, mtr: motor.Motor):
+        self.__motor = mtr
+
+    def arm_push_off(self):
+        self.__motor.change(True, Constants.ROBOT_MOTOR_POWER)
+        while True:
+            if self.arm_arrived():
+                break
+            time.sleep(0.01)
+        self.__motor.stop()
+
+    def arm_move_back(self):
+        self.__motor.change(False, Constants.ROBOT_MOTOR_POWER)
+        while True:
+            if self.arm_arrived():
+                break
+            time.sleep(0.01)
+        self.__motor.stop()
+
+    def arm_arrived(self):
         pass
 
-    def disable(self):
-        GPIO.cleanup()
+    def arm_back(self):
+        pass

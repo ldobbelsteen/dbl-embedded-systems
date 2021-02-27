@@ -27,8 +27,8 @@ class Phototransistor:
     def __value_to_fraction(value: float):
         return round(value / 1024, 3)
 
-    # Requires: making sure that there is constant a physical light on it, such that the brightness percentage is constant.
-    # only returns the brightness
+    # Requires: making sure that there is constant a physical light on it, such that the brightness percentage is
+    # constant. only returns the brightness
     @staticmethod
     def get_color(reading: float):
         reading = Phototransistor.__value_to_fraction(reading) * 100

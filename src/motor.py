@@ -26,7 +26,7 @@ class Motor:
 
     def change(self, forward: bool, power: int):
         if self.__loaded:
-            power = self.__power_check()
+            power = self.__power_check(power)
             self.stop()
             GPIO.output(self.__forward_pin, forward)
             GPIO.output(self.__backward_pin, not forward)

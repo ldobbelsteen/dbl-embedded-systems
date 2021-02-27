@@ -1,11 +1,12 @@
 import motor
+from constants import Constants
 
 
 class Belt:
     _motor = None
 
-    def __init__(self):
-        self._motor = motor.Motor(1, 1, 1)
+    def __init__(self, mtr: motor.Motor):
+        self._motor = mtr
 
     def forward(self, power: int):
         self._motor.change(True, power)
@@ -16,7 +17,7 @@ class Belt:
 
 class SortingBelt(Belt):
     def white(self):
-        super().forward(80)
+        super().forward(Constants.SORTING_BELT_POWER)
 
     def black(self):
-        super().backward(80)
+        super().backward(Constants.SORTING_BELT_POWER)

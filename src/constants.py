@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class Constants(Enum):
-    ##API
+    # Protocol API
     API_URL = "https://whateverEndPoint"
     ENDPOINT_AUTH_LOGIN = "/Authentication/Login"
     ENDPOINT_DEVICE_HEARTBEAT = "/Device/Heartbeat"
@@ -13,6 +13,14 @@ class Constants(Enum):
     ENDPOINT_DEVICE_LOG = "/Device/Log"
     ENDPOINT_DEVICE_SENSORDATA = "/Device/SensorData"
 
-    ##Brightness
+    # Brightness values
     WHITE_VALUE: int = 35
     BLACK_VALUE: int = 15
+
+    # Robot
+    ROBOT_MOTOR_POWER: int = 75
+
+    # Sorting belt
+    SORTING_BELT_POWER: int = 80
+
+    # Controller
