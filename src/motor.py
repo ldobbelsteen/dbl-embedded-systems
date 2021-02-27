@@ -5,11 +5,11 @@ GPIO.setmode(GPIO.BCM)
 
 
 class Motor:
-    __forward_pin = -1
-    __backward_pin = -1
-    __enable_pin = -1
-    __pwm = None
-    __loaded = False
+    __forward_pin: int = -1
+    __backward_pin: int = -1
+    __enable_pin: int = -1
+    __pwm: GPIO.PWM = None
+    __loaded: bool = False
 
     def __init__(self, forward_pin: int = -1, backward_pin: int = -1, enable_pin: int = -1):
         self.__loaded = (forward_pin > -1 and backward_pin > -1 and enable_pin > -1)

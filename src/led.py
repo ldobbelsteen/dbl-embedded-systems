@@ -4,8 +4,8 @@ GPIO.setmode(GPIO.BCM)
 
 
 class Led:
-    __led_pin = -1
-    __loaded = False
+    __led_pin: int = -1
+    __loaded: bool = False
 
     def __init__(self, led_pin: int = -1):
         self.__loaded = led_pin > -1

@@ -4,7 +4,7 @@ from constants import Constants
 
 
 class Robot:
-    __motor = None
+    __motor: motor.Motor = None
     __switch_arrival = None
     __switch_start = None
 

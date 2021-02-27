@@ -24,3 +24,14 @@ class Constants(Enum):
     SORTING_BELT_POWER: int = 80
 
     # Controller
+    R_F_PIN: int = -1
+    R_B_PIN: int = -1
+    R_E_PIN: int = -1
+    SB_F_PIN: int = -1
+    SB_B_PIN: int = -1
+    SB_E_PIN: int = -1
+    PH_CLK_PIN: int = -1
+    PH_DOUT_PIN: int = -1
+    PH_DIN_PIN: int = -1
+    PH_CS_PIN: int = -1
+    LED_PIN: int = -1

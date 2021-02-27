@@ -3,7 +3,7 @@ from constants import Constants
 
 
 class Belt:
-    _motor = None
+    _motor: motor.Motor = None
 
     def __init__(self, mtr: motor.Motor):
         self._motor = mtr
@@ -13,6 +13,9 @@ class Belt:
 
     def backward(self, power: int):
         self._motor.change(False, power)
+
+    def stop(self):
+        self._motor.stop()
 
 
 class SortingBelt(Belt):

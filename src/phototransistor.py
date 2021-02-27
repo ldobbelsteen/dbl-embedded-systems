@@ -4,7 +4,7 @@ from constants import Constants
 
 class Phototransistor:
     __mcp = None
-    __loaded = False
+    __loaded: bool = False
 
     def __init__(self, clk_pin: int = -1, dout_pin: int = -1, din_pin: int = -1, cs_pin: int = -1):
         self.__loaded = (clk_pin > -1 and dout_pin > -1 and din_pin > -1 and cs_pin > -1)
@@ -29,6 +29,7 @@ class Phototransistor:
 
     # Requires: making sure that there is constant a physical light on it, such that the brightness percentage is
     # constant. only returns the brightness
+    # white = 1, black = 0 (protocol requirement)
     @staticmethod
     def get_color(reading: float):
         reading = Phototransistor.__value_to_fraction(reading) * 100
