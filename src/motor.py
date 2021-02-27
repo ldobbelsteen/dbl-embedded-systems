@@ -30,7 +30,7 @@ class Motor:
             self.stop()
             GPIO.output(self.__forward_pin, forward)
             GPIO.output(self.__backward_pin, not forward)
-            self.start(power)
+            self.__start(power)
 
     def change_w_dur(self, forward: bool, power: int, duration: int):
         if self.__loaded:
@@ -38,7 +38,7 @@ class Motor:
             sleep(duration)
             self.stop()
 
-    def start(self, power):
+    def __start(self, power):
         if self.__loaded:
             self.__pwm.start(power)
 
