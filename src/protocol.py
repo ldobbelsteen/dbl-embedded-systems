@@ -37,36 +37,43 @@ class Protocol:
         self.__token = str(dictResp['Token'])
 
     def heartbeat(self):
-        dictResp = self.__get_request(Constants.ENDPOINT_DEVICE_HEARTBEAT)
-        ## check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
+        if self.__token is not None:
+            dictResp = self.__get_request(Constants.ENDPOINT_DEVICE_HEARTBEAT)
+            ## check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
 
     def can_pickup(self):
-        dictResp = self.__get_request(Constants.ENDPOINT_DEVICE_CANPICKUP)
-        ## check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
-        return dictResp['Resp']
+        if self.__token is not None:
+            dictResp = self.__get_request(Constants.ENDPOINT_DEVICE_CANPICKUP)
+            ## check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
+            return dictResp['Resp']
 
     def picked_up_object(self):
-        dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_PICKEDUPOBJECT)
-        return dictResp['Resp']
+        if self.__token is not None:
+            dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_PICKEDUPOBJECT)
+            return dictResp['Resp']
 
     def put_back_object(self):
-        dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_PUTBACKOBJECT)
-        return dictResp['Resp']
+        if self.__token is not None:
+            dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_PUTBACKOBJECT)
+            return dictResp['Resp']
 
     def determined_object(self, color: int):
-        headers = {'Content-Type': 'application/json'}
-        data = {'Color': color}
-        dictResp = self.__post_request(Constants.ENDPOINT_DETERMINED_OBJECT, headers, data)
-        ## check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
+        if self.__token is not None:
+            headers = {'Content-Type': 'application/json'}
+            data = {'Color': color}
+            dictResp = self.__post_request(Constants.ENDPOINT_DETERMINED_OBJECT, headers, data)
+            ## check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
 
     def log(self, tags: list, message: str):
-        headers = {'Content-Type': 'application/json'}
-        data = {'Tags': tags, 'Message': message}
-        dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_LOG, headers, data)
-        ## check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
+        if self.__token is not None:
+            headers = {'Content-Type': 'application/json'}
+            data = {'Tags': tags, 'Message': message}
+            dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_LOG, headers, data)
+            ## check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
 
     def sensor_data(self, data: dict):
-        headers = {'Content-Type': 'application/json'}
-        data = {'Data': data}
-        dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_SENSORDATA, headers, data)
-        ## check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
+        if self.__token is not None:
+            headers = {'Content-Type': 'application/json'}
+            data = {'Data': data}
+            dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_SENSORDATA, headers, data)
+            ## check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
