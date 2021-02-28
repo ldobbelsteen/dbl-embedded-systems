@@ -23,6 +23,8 @@ class Phototransistor:
             return value
         return -1
 
+    # Adafruit MCP3008 returns a number between 0 and 1024,
+    # dividing it by 1024 results in the percentage.
     @staticmethod
     def __value_to_fraction(value: float):
         return round(value / 1024, 3)

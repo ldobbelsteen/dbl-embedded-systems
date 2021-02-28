@@ -1,7 +1,8 @@
+## Contains belt (for main belt), and this file contains SortingBelt (inherits belt).
 import motor
 from constants import Constants
 
-
+# Main belt where all disks come through
 class Belt:
     _motor: motor.Motor = None
 
@@ -9,6 +10,7 @@ class Belt:
         self._motor = mtr
 
     def forward(self, power: int):
+        #change(true = forward & false = backward, power = quantity of speed)
         self._motor.change(True, power)
 
     def backward(self, power: int):
@@ -17,7 +19,8 @@ class Belt:
     def stop(self):
         self._motor.stop()
 
-
+# The belt that is used to sort (after being picked from the main belt)
+# inherits Belt
 class SortingBelt(Belt):
     def white(self):
         super().forward(Constants.SORTING_BELT_POWER)

@@ -32,6 +32,7 @@ class Motor:
             GPIO.output(self.__backward_pin, not forward)
             self.__start(power)
 
+    # change the motor with duration
     def change_w_dur(self, forward: bool, power: int, duration: int):
         if self.__loaded:
             self.change(forward, power)
@@ -46,6 +47,8 @@ class Motor:
         if self.__loaded:
             self.__pwm.stop()
 
+    #robustness checking if the power is a valid value between 0 and 100.
+    #why return only 0 and only 100?
     @staticmethod
     def __power_check(power: int):
         if power < 0:

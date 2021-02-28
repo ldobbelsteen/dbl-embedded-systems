@@ -1,3 +1,4 @@
+#log message printer in the terminal & sender to the API.
 import protocol
 
 
@@ -16,5 +17,7 @@ class Logger:
             tags = ['[' + tag + ']' for tag in tags]
             logs = " ".join(tags) + ': '
         logs = logs + message
+        # print on terminal
         print(logs)
+        # send to API
         self.__protocol.log(tags, message)
