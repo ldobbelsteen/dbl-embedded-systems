@@ -1,22 +1,31 @@
 import requests
 import json
+import time
 from constants import Constants
 
 
 class Protocol:
     __token = None
 
-    def __check_response_status(self, dict_resp: dict):
+    def __check_response_status(self, status_code: int):
         # here error handler
         # switch case (disctResp['statuscode'])
         # case 200: Succes
         # case 400: Return error to log (Terminal + API log)
-        return True
+        return True if status_code == 200 else False
 
     def __get_request(self, endpoint, headers: dict = {}, bool_token: bool = True, returned: bool = True):
         if bool_token and self.__token is not None:
             headers['auth'] = self.__token
-        response = requests.get(Constants.API_URL.value + endpoint, headers=headers)
+
+        tries = 0
+        while tries < 20:
+            response = requests.get(Constants.API_URL.value + endpoint, headers=headers)
+            if self.__check_response_status(response.status_code):
+                break
+            tries = tries + 1
+            time.sleep(0.5)
+
         if returned:
             dictResp = json.loads(response.text)
             # todo-> Check status code before returning (error handling) 200 good, but when it returns lik 400 then it is
@@ -28,7 +37,15 @@ class Protocol:
         # one case.
         if bool_token and self.__token is not None:
             headers['auth'] = self.__token
-        response = requests.post(Constants.API_URL.value + endpoint, data=json.dumps(data), headers=headers)
+
+        tries = 0
+        while tries < 20:
+            response = requests.post(Constants.API_URL.value + endpoint, data=json.dumps(data), headers=headers)
+            if self.__check_response_status(response.status_code):
+                break
+            tries = tries + 1
+            time.sleep(0.5)
+
         dictResp = json.loads(response.text)
         # todo-> Check status code before returning (error handling) 200 good, but when it returns lik 400 then it is
         #  error.
