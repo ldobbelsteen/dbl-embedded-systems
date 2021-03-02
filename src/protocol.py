@@ -27,7 +27,12 @@ class Protocol:
         # one case.
         if bool_token and self.__token is not None:
             headers['auth'] = {'auth': self.__token}
+        print(Constants.API_URL.value + endpoint)
+        print(data)
+        print(headers)
         response = requests.post(Constants.API_URL.value + endpoint, data=data, headers=headers)
+        print(response)
+        print(response.json())
         dictResp = json.loads(response.text)
         # todo-> Check status code before returning (error handling) 200 good, but when it returns lik 400 then it is
         #  error.
@@ -35,7 +40,7 @@ class Protocol:
 
     def login(self):
         headers = {'Content-Type': 'application/json'}
-        data = {'User': 'Username', 'Password': 'Password'}
+        data = {'User': 'group4', 'Password': 'HNTS79MA0E'}
         dictResp = self.__post_request(Constants.ENDPOINT_AUTH_LOGIN.value, headers, data, False)
         self.__token = str(dictResp['Token'])
 
@@ -80,3 +85,9 @@ class Protocol:
             data = {'Data': data}
             dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_SENSORDATA.value, headers, data)
             # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
+
+
+if __name__ == '__main__':
+    protocol = Protocol()
+    protocol.login()
+    print(protocol.can_pickup())
