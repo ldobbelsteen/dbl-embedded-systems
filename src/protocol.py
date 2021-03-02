@@ -13,20 +13,21 @@ class Protocol:
         # case 400: Return error to log (Terminal + API log)
         return True
 
-    def __get_request(self, endpoint, headers: dict = {}, bool_token: bool = True):
+    def __get_request(self, endpoint, headers: dict = {}, bool_token: bool = True, returned: bool = True):
         if bool_token and self.__token is not None:
             headers['auth'] = self.__token
         response = requests.get(Constants.API_URL.value + endpoint, headers=headers)
-        dictResp = json.loads(response.text)
-        # todo-> Check status code before returning (error handling) 200 good, but when it returns lik 400 then it is
-        #  error.
-        return dictResp
+        if returned:
+            dictResp = json.loads(response.text)
+            # todo-> Check status code before returning (error handling) 200 good, but when it returns lik 400 then it is
+            #  error.
+            return dictResp
 
     def __post_request(self, endpoint, headers: dict = {}, data: dict = {}, bool_token: bool = True):
         # Adding auth automatically in order to avoid repititve code, since token is always required by post except
         # one case.
         if bool_token and self.__token is not None:
-            headers['auth'] = {'auth': self.__token}
+            headers['auth'] = self.__token
         response = requests.post(Constants.API_URL.value + endpoint, data=json.dumps(data), headers=headers)
         dictResp = json.loads(response.text)
         # todo-> Check status code before returning (error handling) 200 good, but when it returns lik 400 then it is
@@ -41,7 +42,7 @@ class Protocol:
 
     def heartbeat(self):
         if self.__token is not None:
-            dictResp = self.__get_request(Constants.ENDPOINT_DEVICE_HEARTBEAT.value)
+            self.__get_request(Constants.ENDPOINT_DEVICE_HEARTBEAT.value, {}, True, False)
             # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
 
     def can_pickup(self):
@@ -53,12 +54,12 @@ class Protocol:
     def picked_up_object(self):
         if self.__token is not None:
             dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_PICKEDUPOBJECT.value)
-            return dictResp['Resp']
+            return dictResp
 
     def put_back_object(self):
         if self.__token is not None:
             dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_PUTBACKOBJECT.value)
-            return dictResp['Resp']
+            return dictResp
 
     def determined_object(self, color: int):
         if self.__token is not None:
@@ -66,6 +67,7 @@ class Protocol:
             data = {'Color': color}
             dictResp = self.__post_request(Constants.ENDPOINT_DETERMINED_OBJECT.value, headers, data)
             # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
+            return dictResp
 
     def log(self, tags: list, message: str):
         if self.__token is not None:
@@ -73,6 +75,7 @@ class Protocol:
             data = {'Tags': tags, 'Message': message}
             dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_LOG.value, headers, data)
             # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
+            return dictResp
 
     def sensor_data(self, data: dict):
         if self.__token is not None:
@@ -80,9 +83,16 @@ class Protocol:
             data = {'Data': data}
             dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_SENSORDATA.value, headers, data)
             # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
+            return dictResp
 
 
 if __name__ == '__main__':
     protocol = Protocol()
     protocol.login()
+    protocol.heartbeat()
     print(protocol.can_pickup())
+    print(protocol.picked_up_object())
+    print(protocol.put_back_object())
+    print(protocol.determined_object(0))
+    print(protocol.log(["test"], "This is a test message"))
+    print(protocol.sensor_data({'test': 'test_data'}))
