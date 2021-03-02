@@ -1,11 +1,16 @@
 import requests
 import json
 import time
+import logger
 from constants import Constants
 
 
 class Protocol:
     __token = None
+    __logger = None
+
+    def __init__(self):
+        self.__logger = logger.Logger(self)
 
     def __check_response_status(self, status_code: int):
         # here error handler
