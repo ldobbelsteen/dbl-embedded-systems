@@ -15,7 +15,7 @@ class Protocol:
 
     def __get_request(self, endpoint, headers: dict = {}, bool_token: bool = True):
         if bool_token and self.__token is not None:
-            headers['auth'] = {'auth': self.__token}
+            headers['auth'] = self.__token
         response = requests.get(Constants.API_URL.value + endpoint, headers=headers)
         dictResp = json.loads(response.text)
         # todo-> Check status code before returning (error handling) 200 good, but when it returns lik 400 then it is
@@ -27,12 +27,7 @@ class Protocol:
         # one case.
         if bool_token and self.__token is not None:
             headers['auth'] = {'auth': self.__token}
-        print(Constants.API_URL.value + endpoint)
-        print(data)
-        print(headers)
-        response = requests.post(Constants.API_URL.value + endpoint, data=data, headers=headers)
-        print(response)
-        print(response.json())
+        response = requests.post(Constants.API_URL.value + endpoint, data=json.dumps(data), headers=headers)
         dictResp = json.loads(response.text)
         # todo-> Check status code before returning (error handling) 200 good, but when it returns lik 400 then it is
         #  error.
@@ -53,7 +48,7 @@ class Protocol:
         if self.__token is not None:
             dictResp = self.__get_request(Constants.ENDPOINT_DEVICE_CANPICKUP.value)
             # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
-            return dictResp['Resp']
+            return dictResp
 
     def picked_up_object(self):
         if self.__token is not None:
