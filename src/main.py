@@ -4,7 +4,7 @@ import phototransistor
 import led
 import time
 
-if __name__ == '__main__':
+def main():
 
     # Test first motor
     motor1 = motor.Motor(16, 20, 21)
@@ -29,17 +29,16 @@ if __name__ == '__main__':
     time.sleep(1)
     led1.off()
 
-    # Clean GPIO channels
-    GPIO.cleanup()
-
     # Test phototransistor
     photo = phototransistor.Phototransistor(14, 15, 18, 23)
-    # while True:
-    #     channel = 0
-    #     light = photo.get_reading(channel)
-    #     percentage = round(light * 100, 1)
-    #     print(str(percentage) + "%")
-    #     time.sleep(0.5)
+    while True:
+        reading = photo.get_reading(0)
+        color = photo.get_color(reading)
+        print(reading, color)
+        time.sleep(0.3)
 
-    reading = photo.get_reading(5)
-    color = photo.get_color(reading)
+if __name__ == '__main__':
+    try:
+        main()
+    finally:
+        GPIO.cleanup()
