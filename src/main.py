@@ -4,6 +4,7 @@ import motor
 import phototransistor
 import led
 import time
+import switch
 
 def main():
 
@@ -35,6 +36,12 @@ def main():
     time.sleep(1)
     belt2.black()
     time.sleep(1)
+
+    # Test switch
+    switch1 = switch.Switch(13)
+    for i in range(20):
+        print(switch1.pressed())
+        time.sleep(0.05)
 
     # Test controlling light
     led1 = led.Led(26)
