@@ -47,8 +47,8 @@ class Motor:
         if self.__loaded:
             self.__pwm.stop()
 
-    #robustness checking if the power is a valid value between 0 and 100.
-    #why return only 0 and only 100?
+    # robustness checking if the power is a valid value between 0 and 100.
+    # why return only 0 and only 100?
     @staticmethod
     def __power_check(power: int):
         if power < 0:

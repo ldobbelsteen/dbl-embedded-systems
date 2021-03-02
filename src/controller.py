@@ -20,11 +20,11 @@ class Controller:
     __protocol_enabled: bool
 
     def __init__(self, protocol_enabled: bool):
-        self.__robot = robot.Robot(motor.Motor(Constants.R_F_PIN, Constants.R_B_PIN, Constants.R_E_PIN))
-        self.__sorting_belt = belt.SortingBelt(motor.Motor(Constants.SB_F_PIN, Constants.SB_B_PIN, Constants.SB_E_PIN))
-        self.__phototransistor = phototransistor.Phototransistor(Constants.PH_CLK_PIN, Constants.PH_DOUT_PIN,
-                                                                 Constants.PH_DIN_PIN, Constants.PH_CS_PIN)
-        self.__led = led.Led(Constants.LED_PIN)
+        self.__robot = robot.Robot(motor.Motor(Constants.R_F_PIN.value, Constants.R_B_PIN.value, Constants.R_E_PIN.value))
+        self.__sorting_belt = belt.SortingBelt(motor.Motor(Constants.SB_F_PIN.value, Constants.SB_B_PIN.value, Constants.SB_E_PIN.value))
+        self.__phototransistor = phototransistor.Phototransistor(Constants.PH_CLK_PIN.value, Constants.PH_DOUT_PIN.value,
+                                                                 Constants.PH_DIN_PIN.value, Constants.PH_CS_PIN.value)
+        self.__led = led.Led(Constants.LED_PIN.value)
         self.__protocol_enabled = protocol_enabled
         if protocol_enabled:
             self.__protocol = protocol.Protocol()

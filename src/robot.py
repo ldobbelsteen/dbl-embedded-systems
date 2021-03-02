@@ -12,7 +12,7 @@ class Robot:
         self.__motor = mtr
 
     def arm_push_off(self):
-        self.__motor.change(True, Constants.ROBOT_MOTOR_POWER)
+        self.__motor.change(True, Constants.ROBOT_MOTOR_POWER.value)
         while True:
             if self.arm_arrived():
                 break
@@ -20,7 +20,7 @@ class Robot:
         self.__motor.stop()
 
     def arm_move_back(self):
-        self.__motor.change(False, Constants.ROBOT_MOTOR_POWER)
+        self.__motor.change(False, Constants.ROBOT_MOTOR_POWER.value)
         while True:
             if self.arm_arrived():
                 break
