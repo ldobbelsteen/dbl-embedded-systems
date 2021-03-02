@@ -12,6 +12,8 @@ class Protocol:
         # switch case (disctResp['statuscode'])
         # case 200: Succes
         # case 400: Return error to log (Terminal + API log)
+        if status_code == 401:
+            self.login()
         return True if status_code == 200 else False
 
     def __get_request(self, endpoint, headers: dict = {}, bool_token: bool = True, returned: bool = True):
