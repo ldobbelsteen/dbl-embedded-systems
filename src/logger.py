@@ -1,5 +1,6 @@
 #log message printer in the terminal & sender to the API.
 import protocol
+import datetime
 
 
 class Logger:
@@ -13,6 +14,7 @@ class Logger:
 
     def log(self, tags: list, message: str):
         logs = ''
+        message = str(datetime.datetime.now()) + ": " + message
         if len(tags) > 0:
             tags = ['[' + tag + ']' for tag in tags]
             logs = " ".join(tags) + ': '
