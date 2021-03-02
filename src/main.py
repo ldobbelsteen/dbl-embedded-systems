@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+import belt
 import motor
 import phototransistor
 import led
@@ -22,6 +23,18 @@ def main():
     time.sleep(1)
     motor1.stop()
     motor2.stop()
+
+    # Test belt
+    belt1 = belt.Belt(motor1)
+    belt1.forward(100)
+    time.sleep(1)
+
+    # Test sorting belt
+    belt2 = belt.SortingBelt(motor2)
+    belt2.white()
+    time.sleep(1)
+    belt2.black()
+    time.sleep(1)
 
     # Test controlling light
     led1 = led.Led(26)

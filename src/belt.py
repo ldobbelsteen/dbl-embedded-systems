@@ -23,7 +23,7 @@ class Belt:
 # inherits Belt
 class SortingBelt(Belt):
     def white(self):
-        super().forward(Constants.SORTING_BELT_POWER)
+        super().forward(Constants.SORTING_BELT_POWER.value)
 
     def black(self):
-        super().backward(Constants.SORTING_BELT_POWER)
+        super().backward(Constants.SORTING_BELT_POWER.value)
