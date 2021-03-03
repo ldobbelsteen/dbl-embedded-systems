@@ -2,6 +2,9 @@ from enum import Enum
 
 
 class Constants(Enum):
+    # Isolated
+    ISOLATED: bool = True
+
     # Protocol API
     API_URL: str = "https://brokenprotocol.xyz"
     ENDPOINT_AUTH_LOGIN: str = "/Authentication/Login"

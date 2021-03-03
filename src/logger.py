@@ -1,6 +1,7 @@
-#log message printer in the terminal & sender to the API.
+# log message printer in the terminal & sender to the API.
 import protocol
 import datetime
+from constants import Constants
 
 
 class Logger:
@@ -21,5 +22,6 @@ class Logger:
         logs = logs + message
         # print on terminal
         print(logs)
-        # send to API
-        self.__protocol.log(tags, message)
+        if not Constants.ISOLATED.value:
+            # send to API
+            self.__protocol.log(tags, message)

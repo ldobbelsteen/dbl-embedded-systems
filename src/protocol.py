@@ -127,4 +127,3 @@ if __name__ == '__main__':
     protocol.determined_object(0)
     protocol.log(["test"], "This is a test message")
     protocol.sensor_data({'test': 'test_data'})
-    

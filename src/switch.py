@@ -13,4 +13,11 @@ class Switch:
 			GPIO.setup(self.__input_pin, GPIO.IN)
 	
 	def pressed(self):
-		return GPIO.input(self.__input_pin) == GPIO.HIGH
+		if self.__loaded:
+			return GPIO.input(self.__input_pin) == GPIO.HIGH
+		return None
+
+	def get_pin(self):
+		if self.__loaded:
+			return self.__input_pin
+		return -1
