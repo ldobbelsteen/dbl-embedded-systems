@@ -27,16 +27,17 @@ class Constants(Enum):
     SORTING_BELT_POWER: int = 80
 
     # Controller
-    R_F_PIN: int = -1
-    R_B_PIN: int = -1
-    R_E_PIN: int = -1
-    S_A_PIN: int = -1
-    S_S_PIN: int = -1
-    SB_F_PIN: int = -1
-    SB_B_PIN: int = -1
-    SB_E_PIN: int = -1
-    PH_CLK_PIN: int = -1
-    PH_DOUT_PIN: int = -1
-    PH_DIN_PIN: int = -1
-    PH_CS_PIN: int = -1
-    LED_PIN: int = -1
+    R_F_PIN: int = 9
+    R_B_PIN: int = 11
+    R_E_PIN: int = 10
+    S_A_PIN: int = 13
+    S_S_PIN: int = 19
+    SB_F_PIN: int = 16
+    SB_B_PIN: int = 20
+    SB_E_PIN: int = 21
+    PH_CLK_PIN: int = 14
+    PH_DOUT_PIN: int = 15
+    PH_DIN_PIN: int = 18
+    PH_CS_PIN: int = 23
+    LED_G_PIN: int = 26
+    LED_C_PIN: int = 27

@@ -26,7 +26,7 @@ class Controller:
                                                            Constants.SB_E_PIN.value))
         self.__phototransistor = phototransistor.Phototransistor(Constants.PH_CLK_PIN.value, Constants.PH_DOUT_PIN.value,
                                                                  Constants.PH_DIN_PIN.value, Constants.PH_CS_PIN.value)
-        self.__led = led.Led(Constants.LED_PIN.value)
+        self.__led = led.Led(Constants.LED_G_PIN.value)
         if not Constants.ISOLATED.value:
             self.__protocol = protocol.Protocol()
 
