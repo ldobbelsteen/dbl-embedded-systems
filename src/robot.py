@@ -9,7 +9,7 @@ class Robot:
     __switch_arrival: switch.Switch = None
     __switch_start: switch.Switch = None
 
-    def __init__(self, mtr: motor.Motor):
+    def __init__(self, mtr: motor.Motor, s_arrival: switch.Switch, s_start: switch.Switch):
         self.__motor = mtr
 
     def arm_push_off(self):

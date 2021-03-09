@@ -3,7 +3,7 @@ from constants import Constants
 
 
 class Phototransistor:
-    __mcp = None
+    __mcp: Adafruit_MCP3008.MCP3008 = None
     __loaded: bool = False
 
     def __init__(self, clk_pin: int = -1, dout_pin: int = -1, din_pin: int = -1, cs_pin: int = -1):

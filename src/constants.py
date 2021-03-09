@@ -30,6 +30,8 @@ class Constants(Enum):
     R_F_PIN: int = -1
     R_B_PIN: int = -1
     R_E_PIN: int = -1
+    S_A_PIN: int = -1
+    S_S_PIN: int = -1
     SB_F_PIN: int = -1
     SB_B_PIN: int = -1
     SB_E_PIN: int = -1

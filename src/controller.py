@@ -9,6 +9,7 @@ import phototransistor
 import led
 import motor
 import protocol
+import switch
 
 
 class Controller:
@@ -19,8 +20,10 @@ class Controller:
     __protocol: protocol.Protocol = None
 
     def __init__(self):
-        self.__robot = robot.Robot(motor.Motor(Constants.R_F_PIN.value, Constants.R_B_PIN.value, Constants.R_E_PIN.value))
-        self.__sorting_belt = belt.SortingBelt(motor.Motor(Constants.SB_F_PIN.value, Constants.SB_B_PIN.value, Constants.SB_E_PIN.value))
+        self.__robot = robot.Robot(motor.Motor(Constants.R_F_PIN.value, Constants.R_B_PIN.value, Constants.R_E_PIN.value),
+                                   switch.Switch(Constants.S_A_PIN), switch.Switch(Constants.S_S_PIN))
+        self.__sorting_belt = belt.SortingBelt(motor.Motor(Constants.SB_F_PIN.value, Constants.SB_B_PIN.value,
+                                                           Constants.SB_E_PIN.value))
         self.__phototransistor = phototransistor.Phototransistor(Constants.PH_CLK_PIN.value, Constants.PH_DOUT_PIN.value,
                                                                  Constants.PH_DIN_PIN.value, Constants.PH_CS_PIN.value)
         self.__led = led.Led(Constants.LED_PIN.value)
@@ -28,9 +31,9 @@ class Controller:
             self.__protocol = protocol.Protocol()
 
         self.__led.on()
-        self.system()
+        self.run()
 
-    def system(self):
+    def run(self):
         time_start = datetime.datetime.now()
         if not Constants.ISOLATED.value:
             self.__protocol.heartbeat()
