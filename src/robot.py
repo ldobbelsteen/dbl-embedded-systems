@@ -1,6 +1,7 @@
-import RPi.GPIO as GPIO
+import time
 import motor
 import switch
+import RPi.GPIO as GPIO
 from constants import Constants
 
 
