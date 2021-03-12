@@ -17,14 +17,20 @@ class Constants(Enum):
     ENDPOINT_DEVICE_SENSORDATA: str = "/Device/SensorData"
 
     # Brightness values
-    WHITE_VALUE: int = 35
-    BLACK_VALUE: int = 15
+    LIGHT_GATE_VALUE: int = 500
+    WHITE_RANGE_START: int = 150
+    WHITE_RANGE_END: int = 300
+    BLACK_RANGE_START: int = 30
+    BLACK_RANGE_END: int = 100
 
     # Robot
-    ROBOT_MOTOR_POWER: int = 75
+    ROBOT_MOTOR_POWER: int = 100
 
     # Sorting belt
     SORTING_BELT_POWER: int = 80
+
+    # Main belt
+    MAIN_BELT_POWER: int = 60
 
     # Controller
     R_F_PIN: int = 9
@@ -35,6 +41,9 @@ class Constants(Enum):
     SB_F_PIN: int = 16
     SB_B_PIN: int = 20
     SB_E_PIN: int = 21
+    MB_F_PIN: int = 25
+    MB_B_PIN: int = 8
+    MB_E_PIN: int = 12
     PH_CLK_PIN: int = 14
     PH_DOUT_PIN: int = 15
     PH_DIN_PIN: int = 18

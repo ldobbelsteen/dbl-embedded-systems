@@ -1,49 +1,73 @@
-import RPi.GPIO as GPIO
 import belt
-import motor
-import phototransistor
 import led
 import time
+import motor
+import robot
 import switch
+import phototransistor
+import RPi.GPIO as GPIO
+from constants import Constants
 
 def main():
 
-    motor1 = motor.Motor(16, 20, 21)
-    motor2 = motor.Motor(9, 11, 10)
-    switch1 = switch.Switch(13)
-    switch2 = switch.Switch(19)
-    led1 = led.Led(26)
-    photo1 = phototransistor.Phototransistor(14, 15, 18, 23)
+    main_belt = belt.Belt(motor.Motor(
+        Constants.MB_F_PIN.value,
+        Constants.MB_B_PIN.value,
+        Constants.MB_E_PIN.value,
+    ))
 
-    # Test sorting belt
-    belt1 = belt.SortingBelt(motor1)
-    belt1.white()
-    time.sleep(1)
-    belt1.black()
-    time.sleep(1)
-    belt1.stop()
+    sorting_belt = belt.SortingBelt(motor.Motor(
+        Constants.SB_F_PIN.value,
+        Constants.SB_B_PIN.value,
+        Constants.SB_E_PIN.value,
+    ))
 
-    # Test arm
-    motor2.change(True, 80)
-    while True:
-        if switch1.pressed():
-            motor2.change(False, 80)
-            while True:
-                if switch2.pressed():
-                    motor2.stop()
-                    break
-                time.sleep(0.01)
-            break
-        time.sleep(0.01)
+    main_robot = robot.Robot(
+        motor.Motor(
+            Constants.R_F_PIN.value,
+            Constants.R_B_PIN.value,
+            Constants.R_E_PIN.value,
+        ),
+        switch.Switch(Constants.S_S_PIN.value),
+        switch.Switch(Constants.S_A_PIN.value),
+    )
 
-    # Test phototransistor
-    led1.on()
-    time.sleep(0.5)
-    reading = photo1.get_reading(0)
-    color = photo1.get_color(reading)
-    print(reading, color)
-    time.sleep(0.5)
-    led1.off()
+    photo = phototransistor.Phototransistor(
+        Constants.PH_CLK_PIN.value,
+        Constants.PH_DOUT_PIN.value,
+        Constants.PH_DIN_PIN.value,
+        Constants.PH_CS_PIN.value,
+    )
+
+    gate_light = led.Led(Constants.LED_G_PIN.value)
+    color_light = led.Led(Constants.LED_C_PIN.value)
+
+    # Basic controller logic that has been tested and works
+    main_belt.forward(Constants.MAIN_BELT_POWER.value)
+    gate_light.on()
+    color_light.off()
+    try:
+        while True:
+            gate_reading = photo.get_reading(1)
+            if gate_reading < Constants.LIGHT_GATE_VALUE.value:
+                color_light.on()
+                time.sleep(0.2)
+                color_reading = photo.get_reading(0)
+                color = photo.get_color(color_reading)
+                color_light.off()
+                if color == 1:
+                    sorting_belt.white()
+                elif color == 0:
+                    sorting_belt.black()
+                else:
+                    continue
+                time.sleep(0.4)
+                main_robot.arm_push_off()
+                time.sleep(1)
+            time.sleep(0.05)
+    finally:
+        gate_light.off()
+        color_light.off()
 
 if __name__ == '__main__':
     try:

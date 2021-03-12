@@ -22,17 +22,14 @@ class Phototransistor:
             value = self.__mcp.read_adc_difference(channel)
             return value
         return -1
-
-    # Adafruit MCP3008 returns a number between 0 and 1024,
-    # dividing it by 1024 results in a number between 0 and 1.
-    @staticmethod
-    def __value_to_fraction(value: float):
-        return round(value / 1024, 3)
-
+    
     # Requires: making sure that there is constant a physical light on it, such that the brightness is
     # constant. Only returns the brightness
-    # white = 1, black = 0 (protocol requirement)
+    # white = 1, black = 0, other = -1 (protocol requirement)
     @staticmethod
-    def get_color(reading: float):
-        percentage = Phototransistor.__value_to_fraction(reading) * 100
-        return 1 if int(percentage) > Constants.WHITE_VALUE.value else 0
+    def get_color(reading: int):
+        if reading >= Constants.WHITE_RANGE_START.value and reading <= Constants.WHITE_RANGE_END.value:
+            return 1
+        if reading >= Constants.BLACK_RANGE_START.value and reading <= Constants.BLACK_RANGE_END.value:
+            return 0
+        return -1
