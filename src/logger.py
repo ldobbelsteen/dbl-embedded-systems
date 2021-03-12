@@ -10,10 +10,7 @@ class Logger:
     def __init__(self, prot: protocol.Protocol):
         self.__protocol = prot
 
-    def log(self, message: str):
-        self.log([], message)
-
-    def log(self, tags: list, message: str):
+    def log(self, message: str, tags: list = []):
         logs = ''
         message = str(datetime.datetime.now()) + ": " + message
         if len(tags) > 0:
@@ -24,4 +21,4 @@ class Logger:
         print(logs)
         if not Constants.ISOLATED.value:
             # send to API
-            self.__protocol.log(tags, message)
+            self.__protocol.log(message, tags)
