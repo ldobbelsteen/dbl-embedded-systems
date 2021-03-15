@@ -14,8 +14,8 @@ class Robot:
         self.__motor = mtr
         self.__switch_arrival = s_arrival
         self.__switch_start = s_start
-        GPIO.add_event_detect(self.__switch_arrival.get_pin(), GPIO.RISING, callback=self.arm_arrived)
-        GPIO.add_event_detect(self.__switch_start.get_pin(), GPIO.RISING, callback=self.arm_back)
+        GPIO.add_event_detect(self.__switch_arrival.get_pin(), GPIO.RISING, callback=self.arm_arrived, bouncetime=200)
+        GPIO.add_event_detect(self.__switch_start.get_pin(), GPIO.RISING, callback=self.arm_back, bouncetime=200)
         if not self.__switch_start.pressed():
             self.arm_move_back()
             time.sleep(2)
