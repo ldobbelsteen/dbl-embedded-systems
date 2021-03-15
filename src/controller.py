@@ -104,4 +104,3 @@ class Controller:
         self.__robot.arm_move_back()
         self.__sorting_belt.stop()
         self.__main_belt.stop()
-        GPIO.cleanup()

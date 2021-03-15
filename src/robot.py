@@ -16,15 +16,15 @@ class Robot:
         self.__switch_start = s_start
         GPIO.add_event_detect(self.__switch_arrival.get_pin(), GPIO.RISING, callback=self.arm_arrived, bouncetime=200)
         GPIO.add_event_detect(self.__switch_start.get_pin(), GPIO.RISING, callback=self.arm_back, bouncetime=200)
-        if not self.__switch_start.pressed():
-            self.arm_move_back()
-            time.sleep(2)
+        self.arm_move_back()
+        time.sleep(2)
 
     def arm_push_off(self):
         self.__motor.change(True, Constants.ROBOT_MOTOR_POWER.value)
         
     def arm_move_back(self):
-        self.__motor.change(False, Constants.ROBOT_MOTOR_POWER.value)
+        if not self.__switch_start.pressed():
+            self.__motor.change(False, Constants.ROBOT_MOTOR_POWER.value)
 
     def arm_arrived(self, channel):
         self.__motor.stop()
