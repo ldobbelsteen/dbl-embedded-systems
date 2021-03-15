@@ -60,6 +60,7 @@ class Controller:
             while True:
                 if self.__running:
                     self.__main_belt.forward(Constants.MAIN_BELT_POWER.value)
+                    self.__sorting_belt.white()
                     self.__gate_led.on()
                     self.__color_led.off()
                     while True:
