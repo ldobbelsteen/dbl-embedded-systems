@@ -9,6 +9,7 @@ class Motor:
     __vib_sens_pin: int = -1
     __pwm: GPIO.PWM = None
     __loaded: bool = False
+    __enabled: bool = False
     __controller = None
 
     def __init__(self, forward_pin: int = -1, backward_pin: int = -1, enable_pin: int = -1, vib_sens_pin: int = -1):
@@ -48,15 +49,19 @@ class Motor:
         self.__controller = controller
 
     def __motor_defect(self):
-        if self.__controller is not None and self.__vib_sens_pin != -1:
+        sleep(0.05)
+        if self.__controller is not None and self.__vib_sens_pin != -1 and self.__enabled \
+                and GPIO.input(self.__vib_sens_pin) == GPIO.HIGH:
             self.__controller.motor_disabled(self.__enable_pin)
 
     def __start(self, power):
         if self.__loaded:
             self.__pwm.start(power)
+            self.__enabled = True
 
     def stop(self):
         if self.__loaded:
+            self.__enabled = False
             self.__pwm.stop()
 
     # robustness checking if the power is a valid value between 0 and 100.

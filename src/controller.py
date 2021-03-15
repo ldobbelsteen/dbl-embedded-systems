@@ -103,14 +103,12 @@ class Controller:
             self.shutdown()
 
     def motor_disabled(self, channel):
-        time.sleep(0.5)
-        if GPIO.input(channel) == GPIO.HIGH:
-            self.__logger.log("Motor " + str(channel) + " has been disabled.")
-            self.__running = False
-            self.__gate_led.off()
-            self.__color_led.off()
-            self.__robot.arm_move_back()
-            self.__sorting_belt.stop()
+        self.__logger.log("Motor " + str(channel) + " has been disabled.")
+        self.__running = False
+        self.__gate_led.off()
+        self.__color_led.off()
+        self.__robot.arm_move_back()
+        self.__sorting_belt.stop()
 
     def switch_main(self, channel):
         self.__running = not self.__running
