@@ -26,10 +26,10 @@ class Controller:
     __running: bool = False
 
     def __init__(self):
-        self.__robot = robot.Robot(motor.Motor(Constants.R_F_PIN.value, Constants.R_B_PIN.value, Constants.R_E_PIN.value, Constants.M_1_V_PIN.value),
+        self.__robot = robot.Robot(motor.Motor(Constants.R_F_PIN.value, Constants.R_B_PIN.value, Constants.R_E_PIN.value),
                                    switch.Switch(Constants.S_S_PIN.value), switch.Switch(Constants.S_A_PIN.value))
         self.__sorting_belt = belt.SortingBelt(motor.Motor(Constants.SB_F_PIN.value, Constants.SB_B_PIN.value,
-                                                           Constants.SB_E_PIN.value, Constants.M_2_V_PIN.value))
+                                                           Constants.SB_E_PIN.value, Constants.M_2_V_PIN.value, self.motor_disabled))
         self.__main_belt = belt.Belt(motor.Motor(Constants.MB_F_PIN.value, Constants.MB_B_PIN.value,
                                                  Constants.MB_E_PIN.value))
         self.__phototransistor = phototransistor.Phototransistor(Constants.PH_CLK_PIN.value, Constants.PH_DOUT_PIN.value,
@@ -43,10 +43,6 @@ class Controller:
             self.__protocol = protocol.Protocol(self.__logger)
             self.__protocol.login()
             self.__logger.set_protocol(self.__protocol)
-
-        self.__robot.get_motor().set_controller(self)
-        self.__sorting_belt.get_motor().set_controller(self)
-        self.__main_belt.get_motor().set_controller(self)
 
         self.run()
 
@@ -103,8 +99,8 @@ class Controller:
         finally:
             self.shutdown()
 
-    def motor_disabled(self, channel):
-        self.__logger.log("Motor " + str(channel) + " has been disabled.")
+    def motor_disabled(self):
+        self.__logger.log("Motor has been disabled.")
         self.__running = False
         self.__gate_led.off()
         self.__color_led.off()
