@@ -30,7 +30,7 @@ class Constants(Enum):
     SORTING_BELT_POWER: int = 100
 
     # Main belt
-    MAIN_BELT_POWER: int = 60
+    MAIN_BELT_POWER: int = 70
 
     # Controller
     R_F_PIN: int = 9

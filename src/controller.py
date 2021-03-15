@@ -46,7 +46,7 @@ class Controller:
 
         for i in Constants.VIB_SENSORS_PINS.value:
             GPIO.setup(i, GPIO.IN)
-            # GPIO.add_event_detect(i, GPIO.RISING, callback=self.motor_disabled, bouncetime=500)
+            GPIO.add_event_detect(i, GPIO.RISING, callback=self.motor_disabled, bouncetime=500)
 
         self.run()
 
@@ -56,11 +56,6 @@ class Controller:
             self.__protocol.heartbeat()
             last_heartbeat = datetime.datetime.now()
 
-        while not self.__running:
-            time.sleep(0.05)
-        self.__main_belt.forward(Constants.MAIN_BELT_POWER.value)
-        self.__gate_led.on()
-        self.__color_led.off()
         try:
             while True:
                 if self.__running:
@@ -98,7 +93,7 @@ class Controller:
                                 self.__protocol.heartbeat()
                                 last_heartbeat = datetime.datetime.now()
 
-                            if (datetime.datetime.now() - time_start).seconds >= 180:  # possible shutdown requirement
+                            if (datetime.datetime.now() - time_start).seconds >= 180 or not self.__running:  # possible shutdown requirement
                                 break
                         else:
                             time.sleep(0.05)
