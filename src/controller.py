@@ -16,6 +16,7 @@ import switch
 class Controller:
     __robot: robot.Robot = None
     __sorting_belt: belt.SortingBelt = None
+    __main_belt: belt.Belt = None
     __phototransistor: phototransistor.Phototransistor = None
     __gate_led: led.Led = None
     __color_led: led.Led = None
@@ -28,6 +29,8 @@ class Controller:
                                    switch.Switch(Constants.S_S_PIN.value), switch.Switch(Constants.S_A_PIN.value))
         self.__sorting_belt = belt.SortingBelt(motor.Motor(Constants.SB_F_PIN.value, Constants.SB_B_PIN.value,
                                                            Constants.SB_E_PIN.value))
+        self.__main_belt = belt.Belt(motor.Motor(Constants.MB_F_PIN.value, Constants.MB_B_PIN.value,
+                                                 Constants.MB_E_PIN.value))
         self.__phototransistor = phototransistor.Phototransistor(Constants.PH_CLK_PIN.value, Constants.PH_DOUT_PIN.value,
                                                                  Constants.PH_DIN_PIN.value, Constants.PH_CS_PIN.value)
         self.__gate_led = led.Led(Constants.LED_G_PIN.value)
@@ -50,6 +53,7 @@ class Controller:
             self.__protocol.heartbeat()
             last_heartbeat = datetime.datetime.now()
 
+        self.__main_belt.forward(Constants.MAIN_BELT_POWER)
         self.__gate_led.on()
         self.__color_led.off()
         try:
