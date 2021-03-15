@@ -25,7 +25,7 @@ class Controller:
 
     def __init__(self):
         self.__robot = robot.Robot(motor.Motor(Constants.R_F_PIN.value, Constants.R_B_PIN.value, Constants.R_E_PIN.value),
-                                   switch.Switch(Constants.S_A_PIN), switch.Switch(Constants.S_S_PIN))
+                                   switch.Switch(Constants.S_S_PIN.value), switch.Switch(Constants.S_A_PIN.value))
         self.__sorting_belt = belt.SortingBelt(motor.Motor(Constants.SB_F_PIN.value, Constants.SB_B_PIN.value,
                                                            Constants.SB_E_PIN.value))
         self.__phototransistor = phototransistor.Phototransistor(Constants.PH_CLK_PIN.value, Constants.PH_DOUT_PIN.value,
@@ -38,8 +38,9 @@ class Controller:
             self.__protocol.login()
             self.__logger.set_protocol(self.__protocol)
 
-        for i in Constants.VIB_SENSORS_PINS:
-            GPIO.add_event_detect(i, GPIO.RISING, callback=self.motor_disabled)
+        # for i in Constants.VIB_SENSORS_PINS.value:
+        #     GPIO.setup(i, GPIO.IN)
+        #     GPIO.add_event_detect(i, GPIO.RISING, callback=self.motor_disabled)
 
         self.run()
 
