@@ -1,14 +1,10 @@
 # log message printer in the terminal & sender to the API.
-import protocol
 import datetime
 from constants import Constants
 
 
 class Logger:
     __protocol = None
-
-    def __init__(self, prot: protocol.Protocol):
-        self.__protocol = prot
 
     def log(self, message: str, tags: list = []):
         logs = ''
@@ -19,6 +15,9 @@ class Logger:
         logs = logs + message
         # print on terminal
         print(logs)
-        if not Constants.ISOLATED.value:
+        if not Constants.ISOLATED.value or self.__protocol is not None:
             # send to API
             self.__protocol.log(message, tags)
+
+    def set_protocol(self, prot):
+        self.__protocol = prot

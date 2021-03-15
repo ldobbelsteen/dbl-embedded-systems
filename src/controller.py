@@ -9,6 +9,7 @@ import phototransistor
 import led
 import motor
 import protocol
+import logger
 import switch
 
 
@@ -16,8 +17,10 @@ class Controller:
     __robot: robot.Robot = None
     __sorting_belt: belt.SortingBelt = None
     __phototransistor: phototransistor.Phototransistor = None
-    __led: led.Led = None
+    __gate_led: led.Led = None
+    __color_led: led.Led = None
     __protocol: protocol.Protocol = None
+    __logger: logger.Logger = None
 
     def __init__(self):
         self.__robot = robot.Robot(motor.Motor(Constants.R_F_PIN.value, Constants.R_B_PIN.value, Constants.R_E_PIN.value),
@@ -26,11 +29,14 @@ class Controller:
                                                            Constants.SB_E_PIN.value))
         self.__phototransistor = phototransistor.Phototransistor(Constants.PH_CLK_PIN.value, Constants.PH_DOUT_PIN.value,
                                                                  Constants.PH_DIN_PIN.value, Constants.PH_CS_PIN.value)
-        self.__led = led.Led(Constants.LED_G_PIN.value)
+        self.__gate_led = led.Led(Constants.LED_G_PIN.value)
+        self.__color_led = led.Led(Constants.LED_C_PIN.value)
+        self.__logger = logger.Logger()
         if not Constants.ISOLATED.value:
-            self.__protocol = protocol.Protocol()
+            self.__protocol = protocol.Protocol(self.__logger)
+            self.__protocol.login()
+            self.__logger.set_protocol(self.__protocol)
 
-        self.__led.on()
         self.run()
 
     def run(self):
@@ -39,35 +45,47 @@ class Controller:
             self.__protocol.heartbeat()
             last_heartbeat = datetime.datetime.now()
 
-        while True:
-            color = self.__phototransistor.get_color(self.__phototransistor.get_reading(0))
-            if color != -1:
-                if not Constants.ISOLATED.value and not self.__protocol.can_pickup():
-                    time.sleep(1)
-                else:
-                    self.__robot.arm_push_off()
-                    if color == 0:
-                        self.__sorting_belt.black()
-                    elif color == 1:
-                        self.__sorting_belt.white()
+        self.__gate_led.on()
+        self.__color_led.off()
+        try:
+            while True:
+                gate_reading = self.__phototransistor.get_reading(1)
+                if gate_reading < Constants.LIGHT_GATE_VALUE.value:
+                    if Constants.ISOLATED.value or self.__protocol.can_pickup():
+                        self.__color_led.on()
+                        time.sleep(0.2)
+                        color_reading = self.__phototransistor.get_reading(0)
+                        color = self.__phototransistor.get_color(color_reading)
+                        self.__color_led.off()
+                        if color == 1:
+                            self.__sorting_belt.white()
+                        elif color == 0:
+                            self.__sorting_belt.black()
+                        else:
+                            continue  # log and error handling: disk has wrong color
+                        time.sleep(0.4)
+                        self.__robot.arm_push_off()
 
-                    if not Constants.ISOLATED.value:
-                        self.__protocol.picked_up_object()
-                        self.__protocol.determined_object(color)
+                        if not Constants.ISOLATED.value:
+                            self.__protocol.picked_up_object()
+                            self.__protocol.determined_object(color)
+
                     time.sleep(1)
-            else:
+
                 time.sleep(0.05)
 
-            if not Constants.ISOLATED.value and (datetime.datetime.now() - last_heartbeat).seconds >= 3:
-                self.__protocol.heartbeat()
-                last_heartbeat = datetime.datetime.now()
+                if not Constants.ISOLATED.value and (datetime.datetime.now() - last_heartbeat).seconds >= 3:
+                    self.__protocol.heartbeat()
+                    last_heartbeat = datetime.datetime.now()
 
-            if (datetime.datetime.now() - time_start).seconds >= 180:  # possible shutdown requirement
-                break
-        self.shutdown()
+                if (datetime.datetime.now() - time_start).seconds >= 180:  # possible shutdown requirement
+                    break
+        finally:
+            self.shutdown()
 
     def shutdown(self):
+        self.__gate_led.off()
+        self.__color_led.off()
         self.__robot.arm_move_back()
-        self.__led.off()
         self.__sorting_belt.stop()
         GPIO.cleanup()

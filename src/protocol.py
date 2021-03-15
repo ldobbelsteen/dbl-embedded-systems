@@ -9,8 +9,8 @@ class Protocol:
     __token = None
     __logger = None
 
-    def __init__(self):
-        self.__logger = logger.Logger(self)
+    def __init__(self, log: logger.Logger):
+        self.__logger = log
 
     def __check_response_status(self, status_code: int):
         # here error handler
@@ -118,12 +118,19 @@ class Protocol:
 
 
 if __name__ == '__main__':
-    protocol = Protocol()
+    logger = logger.Logger()
+    protocol = Protocol(logger)
     protocol.login()
     protocol.heartbeat()
-    protocol.can_pickup()
+    while True:
+        can_pickup = protocol.can_pickup()
+        protocol.heartbeat()
+        print(can_pickup)
+        if can_pickup:
+            break
+        time.sleep(2)
     protocol.picked_up_object()
     protocol.put_back_object()
     protocol.determined_object(0)
-    protocol.log(["test"], "This is a test message")
+    protocol.log("This is a test message", ["test"])
     protocol.sensor_data({'test': 'test_data'})
