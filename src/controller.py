@@ -46,7 +46,7 @@ class Controller:
 
         for i in Constants.VIB_SENSORS_PINS.value:
             GPIO.setup(i, GPIO.IN)
-            GPIO.add_event_detect(i, GPIO.RISING, callback=self.motor_disabled, bouncetime=500)
+            # GPIO.add_event_detect(i, GPIO.RISING, callback=self.motor_disabled, bouncetime=500)
 
         self.run()
 
@@ -106,7 +106,7 @@ class Controller:
             self.__logger.log("Motor " + str(channel) + " has been disabled.")
             self.__running = False
 
-    def switch_main(self):
+    def switch_main(self, channel):
         self.__running = not self.__running
 
     def shutdown(self):
