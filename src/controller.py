@@ -26,10 +26,10 @@ class Controller:
     __running: bool = False
 
     def __init__(self):
-        self.__robot = robot.Robot(motor.Motor(Constants.R_F_PIN.value, Constants.R_B_PIN.value, Constants.R_E_PIN.value),
+        self.__robot = robot.Robot(motor.Motor(Constants.R_F_PIN.value, Constants.R_B_PIN.value, Constants.R_E_PIN.value, Constants.M_1_V_PIN.value),
                                    switch.Switch(Constants.S_S_PIN.value), switch.Switch(Constants.S_A_PIN.value))
         self.__sorting_belt = belt.SortingBelt(motor.Motor(Constants.SB_F_PIN.value, Constants.SB_B_PIN.value,
-                                                           Constants.SB_E_PIN.value))
+                                                           Constants.SB_E_PIN.value, Constants.M_2_V_PIN.value))
         self.__main_belt = belt.Belt(motor.Motor(Constants.MB_F_PIN.value, Constants.MB_B_PIN.value,
                                                  Constants.MB_E_PIN.value))
         self.__phototransistor = phototransistor.Phototransistor(Constants.PH_CLK_PIN.value, Constants.PH_DOUT_PIN.value,
@@ -47,10 +47,6 @@ class Controller:
         self.__robot.get_motor().set_controller(self)
         self.__sorting_belt.get_motor().set_controller(self)
         self.__main_belt.get_motor().set_controller(self)
-
-        for i in Constants.VIB_SENSORS_PINS.value:
-            GPIO.setup(i, GPIO.IN)
-            GPIO.add_event_detect(i, GPIO.RISING, callback=self.motor_disabled, bouncetime=500)
 
         self.run()
 
