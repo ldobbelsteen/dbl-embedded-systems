@@ -44,6 +44,10 @@ class Controller:
             self.__protocol.login()
             self.__logger.set_protocol(self.__protocol)
 
+        self.__robot.get_motor().set_controller(self)
+        self.__sorting_belt.get_motor().set_controller(self)
+        self.__main_belt.get_motor().set_controller(self)
+
         for i in Constants.VIB_SENSORS_PINS.value:
             GPIO.setup(i, GPIO.IN)
             GPIO.add_event_detect(i, GPIO.RISING, callback=self.motor_disabled, bouncetime=500)

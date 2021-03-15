@@ -32,3 +32,6 @@ class Robot:
 
     def arm_back(self, channel):
         self.__motor.stop()
+
+    def get_motor(self):
+        return self.__motor

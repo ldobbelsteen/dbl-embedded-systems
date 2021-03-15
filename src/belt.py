@@ -20,6 +20,9 @@ class Belt:
     def stop(self):
         self._motor.stop()
 
+    def get_motor(self):
+        return self._motor
+
 
 # The belt that is used to sort (after being picked from the main belt)
 # inherits Belt
