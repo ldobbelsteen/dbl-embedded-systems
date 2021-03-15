@@ -26,9 +26,9 @@ class Robot:
     def arm_move_back(self):
         self.__motor.change(False, Constants.ROBOT_MOTOR_POWER.value)
 
-    def arm_arrived(self):
+    def arm_arrived(self, channel):
         self.__motor.stop()
         self.arm_move_back()
 
-    def arm_back(self):
+    def arm_back(self, channel):
         self.__motor.stop()
