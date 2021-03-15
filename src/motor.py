@@ -50,8 +50,7 @@ class Motor:
 
     def __motor_defect(self):
         sleep(0.05)
-        if self.__controller is not None and self.__vib_sens_pin != -1 and self.__enabled \
-                and GPIO.input(self.__vib_sens_pin) == GPIO.HIGH:
+        if self.__controller is not None and self.__vib_sens_pin != -1 and self.__enabled and GPIO.input(self.__vib_sens_pin) == GPIO.HIGH:
             self.__controller.motor_disabled(self.__enable_pin)
 
     def __start(self, power):
