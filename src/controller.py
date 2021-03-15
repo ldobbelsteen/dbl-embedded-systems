@@ -64,37 +64,44 @@ class Controller:
         try:
             while True:
                 if self.__running:
-                    gate_reading = self.__phototransistor.get_reading(1)
-                    if gate_reading < Constants.LIGHT_GATE_VALUE.value:
-                        if Constants.ISOLATED.value or self.__protocol.can_pickup():
-                            self.__color_led.on()
-                            time.sleep(0.2)
-                            color_reading = self.__phototransistor.get_reading(0)
-                            color = self.__phototransistor.get_color(color_reading)
-                            self.__color_led.off()
-                            if color == 1:
-                                self.__sorting_belt.white()
-                            elif color == 0:
-                                self.__sorting_belt.black()
-                            else:
-                                continue  # log and error handling: disk has wrong color
-                            time.sleep(0.4)
-                            self.__robot.arm_push_off()
+                    self.__main_belt.forward(Constants.MAIN_BELT_POWER.value)
+                    self.__gate_led.on()
+                    self.__color_led.off()
+                    while True:
+                        if self.__running:
+                            gate_reading = self.__phototransistor.get_reading(1)
+                            if gate_reading < Constants.LIGHT_GATE_VALUE.value:
+                                if Constants.ISOLATED.value or self.__protocol.can_pickup():
+                                    self.__color_led.on()
+                                    time.sleep(0.2)
+                                    color_reading = self.__phototransistor.get_reading(0)
+                                    color = self.__phototransistor.get_color(color_reading)
+                                    self.__color_led.off()
+                                    if color == 1:
+                                        self.__sorting_belt.white()
+                                    elif color == 0:
+                                        self.__sorting_belt.black()
+                                    else:
+                                        continue  # log and error handling: disk has wrong color
+                                    time.sleep(0.4)
+                                    self.__robot.arm_push_off()
 
-                            if not Constants.ISOLATED.value:
-                                self.__protocol.picked_up_object()
-                                self.__protocol.determined_object(color)
+                                    if not Constants.ISOLATED.value:
+                                        self.__protocol.picked_up_object()
+                                        self.__protocol.determined_object(color)
 
-                        time.sleep(1)
+                                time.sleep(1)
 
-                    time.sleep(0.05)
+                            time.sleep(0.05)
 
-                    if not Constants.ISOLATED.value and (datetime.datetime.now() - last_heartbeat).seconds >= 3:
-                        self.__protocol.heartbeat()
-                        last_heartbeat = datetime.datetime.now()
+                            if not Constants.ISOLATED.value and (datetime.datetime.now() - last_heartbeat).seconds >= 3:
+                                self.__protocol.heartbeat()
+                                last_heartbeat = datetime.datetime.now()
 
-                    if (datetime.datetime.now() - time_start).seconds >= 180:  # possible shutdown requirement
-                        break
+                            if (datetime.datetime.now() - time_start).seconds >= 180:  # possible shutdown requirement
+                                break
+                        else:
+                            time.sleep(0.05)
                 else:
                     time.sleep(0.05)
         finally:
@@ -105,9 +112,15 @@ class Controller:
         if GPIO.input(channel) == GPIO.HIGH:
             self.__logger.log("Motor " + str(channel) + " has been disabled.")
             self.__running = False
+            self.__gate_led.off()
+            self.__color_led.off()
+            self.__robot.arm_move_back()
+            self.__sorting_belt.stop()
 
     def switch_main(self, channel):
         self.__running = not self.__running
+        if not self.__running:
+            self.shutdown()
 
     def shutdown(self):
         self.__gate_led.off()
