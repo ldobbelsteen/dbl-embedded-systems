@@ -21,6 +21,7 @@ class Controller:
     __color_led: led.Led = None
     __protocol: protocol.Protocol = None
     __logger: logger.Logger = None
+    __running: bool = True
 
     def __init__(self):
         self.__robot = robot.Robot(motor.Motor(Constants.R_F_PIN.value, Constants.R_B_PIN.value, Constants.R_E_PIN.value),
@@ -36,6 +37,9 @@ class Controller:
             self.__protocol = protocol.Protocol(self.__logger)
             self.__protocol.login()
             self.__logger.set_protocol(self.__protocol)
+
+        for i in Constants.VIB_SENSORS_PINS:
+            GPIO.add_event_detect(i, GPIO.RISING, callback=self.motor_disabled(i))
 
         self.run()
 
@@ -78,10 +82,16 @@ class Controller:
                     self.__protocol.heartbeat()
                     last_heartbeat = datetime.datetime.now()
 
-                if (datetime.datetime.now() - time_start).seconds >= 180:  # possible shutdown requirement
+                if (datetime.datetime.now() - time_start).seconds >= 180 and self.__running:  # possible shutdown requirement
                     break
         finally:
             self.shutdown()
+
+    def motor_disabled(self, motor_id: int):
+        time.sleep(0.5)
+        if GPIO.input(motor_id) == GPIO.LOW:
+            self.__logger.log("Motor " + str(motor_id) + " has been disabled.")
+            self.__running = False
 
     def shutdown(self):
         self.__gate_led.off()
