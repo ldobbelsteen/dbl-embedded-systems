@@ -20,9 +20,10 @@ class Controller:
     __phototransistor: phototransistor.Phototransistor = None
     __gate_led: led.Led = None
     __color_led: led.Led = None
+    __main_switch: switch.Switch = None
     __protocol: protocol.Protocol = None
     __logger: logger.Logger = None
-    __running: bool = True
+    __running: bool = False
 
     def __init__(self):
         self.__robot = robot.Robot(motor.Motor(Constants.R_F_PIN.value, Constants.R_B_PIN.value, Constants.R_E_PIN.value),
@@ -35,6 +36,8 @@ class Controller:
                                                                  Constants.PH_DIN_PIN.value, Constants.PH_CS_PIN.value)
         self.__gate_led = led.Led(Constants.LED_G_PIN.value)
         self.__color_led = led.Led(Constants.LED_C_PIN.value)
+        self.__main_switch = switch.Switch(Constants.MAIN_SWITCH_PIN.value)
+        GPIO.add_event_detect(self.__main_switch.get_pin(), GPIO.RISING, callback=self.switch_main, bouncetime=200)
         self.__logger = logger.Logger()
         if not Constants.ISOLATED.value:
             self.__protocol = protocol.Protocol(self.__logger)
@@ -53,42 +56,47 @@ class Controller:
             self.__protocol.heartbeat()
             last_heartbeat = datetime.datetime.now()
 
+        while not self.__running:
+            time.sleep(0.05)
         self.__main_belt.forward(Constants.MAIN_BELT_POWER.value)
         self.__gate_led.on()
         self.__color_led.off()
         try:
             while True:
-                gate_reading = self.__phototransistor.get_reading(1)
-                if gate_reading < Constants.LIGHT_GATE_VALUE.value:
-                    if Constants.ISOLATED.value or self.__protocol.can_pickup():
-                        self.__color_led.on()
-                        time.sleep(0.2)
-                        color_reading = self.__phototransistor.get_reading(0)
-                        color = self.__phototransistor.get_color(color_reading)
-                        self.__color_led.off()
-                        if color == 1:
-                            self.__sorting_belt.white()
-                        elif color == 0:
-                            self.__sorting_belt.black()
-                        else:
-                            continue  # log and error handling: disk has wrong color
-                        time.sleep(0.4)
-                        self.__robot.arm_push_off()
+                if self.__running:
+                    gate_reading = self.__phototransistor.get_reading(1)
+                    if gate_reading < Constants.LIGHT_GATE_VALUE.value:
+                        if Constants.ISOLATED.value or self.__protocol.can_pickup():
+                            self.__color_led.on()
+                            time.sleep(0.2)
+                            color_reading = self.__phototransistor.get_reading(0)
+                            color = self.__phototransistor.get_color(color_reading)
+                            self.__color_led.off()
+                            if color == 1:
+                                self.__sorting_belt.white()
+                            elif color == 0:
+                                self.__sorting_belt.black()
+                            else:
+                                continue  # log and error handling: disk has wrong color
+                            time.sleep(0.4)
+                            self.__robot.arm_push_off()
 
-                        if not Constants.ISOLATED.value:
-                            self.__protocol.picked_up_object()
-                            self.__protocol.determined_object(color)
+                            if not Constants.ISOLATED.value:
+                                self.__protocol.picked_up_object()
+                                self.__protocol.determined_object(color)
 
-                    time.sleep(1)
+                        time.sleep(1)
 
-                time.sleep(0.05)
+                    time.sleep(0.05)
 
-                if not Constants.ISOLATED.value and (datetime.datetime.now() - last_heartbeat).seconds >= 3:
-                    self.__protocol.heartbeat()
-                    last_heartbeat = datetime.datetime.now()
+                    if not Constants.ISOLATED.value and (datetime.datetime.now() - last_heartbeat).seconds >= 3:
+                        self.__protocol.heartbeat()
+                        last_heartbeat = datetime.datetime.now()
 
-                if (datetime.datetime.now() - time_start).seconds >= 180 or not self.__running:  # possible shutdown requirement
-                    break
+                    if (datetime.datetime.now() - time_start).seconds >= 180:  # possible shutdown requirement
+                        break
+                else:
+                    time.sleep(0.05)
         finally:
             self.shutdown()
 
@@ -97,6 +105,9 @@ class Controller:
         if GPIO.input(channel) == GPIO.HIGH:
             self.__logger.log("Motor " + str(channel) + " has been disabled.")
             self.__running = False
+
+    def switch_main(self):
+        self.__running = not self.__running
 
     def shutdown(self):
         self.__gate_led.off()
