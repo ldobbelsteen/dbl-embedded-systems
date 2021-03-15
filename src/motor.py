@@ -47,7 +47,7 @@ class Motor:
     def set_controller(self, controller):
         self.__controller = controller
 
-    def __motor_defect(self):
+    def __motor_defect(self, channel):
         if self.__controller is not None and self.__vib_sens_pin != -1:
             self.__controller.motor_disabled(self.__enable_pin)
 

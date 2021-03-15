@@ -51,5 +51,5 @@ class Constants(Enum):
     LED_G_PIN: int = 26
     LED_C_PIN: int = 27
     MAIN_SWITCH_PIN: int = 22
-    M_1_V_PINT: int = -1
-    M_2_V_PINT: int = -1
+    M_1_V_PIN: int = 2
+    M_2_V_PIN: int = 4
