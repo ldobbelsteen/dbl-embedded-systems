@@ -1,8 +1,6 @@
 # Class Led, contains Led light initalization + on + off commands.
 import RPi.GPIO as GPIO
 
-GPIO.setmode(GPIO.BCM)
-
 
 class Led:
     __led_pin: int = -1

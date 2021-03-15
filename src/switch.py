@@ -1,7 +1,5 @@
 import RPi.GPIO as GPIO
 
-GPIO.setmode(GPIO.BCM)
-
 
 class Switch:
 	__input_pin: int = -1

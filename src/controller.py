@@ -41,9 +41,9 @@ class Controller:
             self.__protocol.login()
             self.__logger.set_protocol(self.__protocol)
 
-        # for i in Constants.VIB_SENSORS_PINS.value:
-        #     GPIO.setup(i, GPIO.IN)
-        #     GPIO.add_event_detect(i, GPIO.RISING, callback=self.motor_disabled)
+        for i in Constants.VIB_SENSORS_PINS.value:
+            GPIO.setup(i, GPIO.IN)
+            GPIO.add_event_detect(i, GPIO.RISING, callback=self.motor_disabled, bouncetime=500)
 
         self.run()
 
@@ -87,14 +87,14 @@ class Controller:
                     self.__protocol.heartbeat()
                     last_heartbeat = datetime.datetime.now()
 
-                if (datetime.datetime.now() - time_start).seconds >= 180 and self.__running:  # possible shutdown requirement
+                if (datetime.datetime.now() - time_start).seconds >= 180 or not self.__running:  # possible shutdown requirement
                     break
         finally:
             self.shutdown()
 
     def motor_disabled(self, channel):
         time.sleep(0.5)
-        if GPIO.input(channel) == GPIO.LOW:
+        if GPIO.input(channel) == GPIO.HIGH:
             self.__logger.log("Motor " + str(channel) + " has been disabled.")
             self.__running = False
 
@@ -103,4 +103,5 @@ class Controller:
         self.__color_led.off()
         self.__robot.arm_move_back()
         self.__sorting_belt.stop()
+        self.__main_belt.stop()
         GPIO.cleanup()
