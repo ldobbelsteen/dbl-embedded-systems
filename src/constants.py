@@ -27,7 +27,7 @@ class Constants(Enum):
     ROBOT_MOTOR_POWER: int = 100
 
     # Sorting belt
-    SORTING_BELT_POWER: int = 80
+    SORTING_BELT_POWER: int = 100
 
     # Main belt
     MAIN_BELT_POWER: int = 60

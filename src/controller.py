@@ -53,7 +53,7 @@ class Controller:
             self.__protocol.heartbeat()
             last_heartbeat = datetime.datetime.now()
 
-        self.__main_belt.forward(Constants.MAIN_BELT_POWER)
+        self.__main_belt.forward(Constants.MAIN_BELT_POWER.value)
         self.__gate_led.on()
         self.__color_led.off()
         try:
