@@ -2,9 +2,8 @@ from typing import Callable
 import RPi.GPIO as GPIO
 from time import sleep
 
-def print_panic():
-    print("Motor has stopped unexpectedly!")
-
+def print_panic(pin: int):
+    print("Motor on pin " + str(pin) + " is behaving unexpectedly!")
 
 class Motor:
     __forward_pin: int = -1
@@ -15,7 +14,7 @@ class Motor:
     __loaded: bool = False
     __moving: bool = False
     __controller = None
-    __panic_func = None
+    __panic_func: Callable = None
 
     def __init__(
         self,
@@ -37,16 +36,32 @@ class Motor:
             GPIO.setup(self.__backward_pin, GPIO.OUT)
             GPIO.setup(self.__enable_pin, GPIO.OUT)
 
-            if self.__vib_sens_pin != -1:
+            # If vibration sensor is passed, detect changes in its state
+            if self.__vib_sens_pin > -1:
                 GPIO.setup(self.__vib_sens_pin, GPIO.IN)
-                GPIO.add_event_detect(self.__vib_sens_pin, GPIO.BOTH, callback=self.vib_state_changed, bouncetime=100)
+                GPIO.add_event_detect(
+                    self.__vib_sens_pin,
+                    GPIO.BOTH,
+                    callback=self.vib_state_changed,
+                    bouncetime=Constants.VIB_SENSOR_DEBOUNCE.value)
 
             self.__pwm = GPIO.PWM(self.__enable_pin, 100)
 
+    # Handle change in the state of a vibration sensor
     def vib_state_changed(self, channel):
-        sleep(0.1)
-        vib_state = GPIO.input(self.__vib_sens_pin) == GPIO.LOW
-        if vib_state != self.__moving:
+        state = GPIO.input(self.__vib_sens_pin) == GPIO.LOW
+
+        # During the sensor's debounce time, check if its state changes a few times.
+        # If it does change, the state is unstable and the callback is rejected
+        check_count = 10
+        for _ in range(check_count):
+            sleep(Constants.VIB_SENSOR_DEBOUNCE_MS.value / check_count)
+            if state != GPIO.input(self.__vib_sens_pin) == GPIO.LOW:
+                return
+
+        # If the state is stable, check if it coincides with the expected state.
+        # If it doesn't, run the panic function.
+        if state != self.__moving:
             self.__panic_func()
 
     def change(self, forward: bool, power: int):
@@ -56,21 +71,6 @@ class Motor:
             GPIO.output(self.__forward_pin, forward)
             GPIO.output(self.__backward_pin, not forward)
             self.__start(power)
-
-    # # change the motor with duration
-    # def change_w_dur(self, forward: bool, power: int, duration: int):
-    #     if self.__loaded:
-    #         self.change(forward, power)
-    #         sleep(duration)
-    #         self.stop()
-
-    # def set_controller(self, controller):
-    #     self.__controller = controller
-
-    # def __motor_defect(self, channel):
-    #     sleep(0.05)
-    #     if self.__controller is not None and self.__vib_sens_pin != -1 and self.__enabled and GPIO.input(self.__vib_sens_pin) == GPIO.LOW:
-    #         self.__controller.motor_disabled(self.__enable_pin)
 
     def __start(self, power):
         if self.__loaded:
