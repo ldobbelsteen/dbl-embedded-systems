@@ -26,6 +26,9 @@ class Controller:
     __running: bool = False
 
     def __init__(self):
+        self.__running = False
+        self.__gate_led = led.Led(Constants.LED_G_PIN.value)
+        self.__color_led = led.Led(Constants.LED_C_PIN.value)
         self.__robot = robot.Robot(
             motor.Motor(
                 Constants.R_F_PIN.value,
@@ -57,14 +60,11 @@ class Controller:
             Constants.PH_DIN_PIN.value,
             Constants.PH_CS_PIN.value,
         )
-        self.__gate_led = led.Led(Constants.LED_G_PIN.value)
-        self.__color_led = led.Led(Constants.LED_C_PIN.value)
         self.__logger = logger.Logger()
         if not Constants.ISOLATED.value:
             self.__protocol = protocol.Protocol(self.__logger)
             self.__protocol.login()
             self.__logger.set_protocol(self.__protocol)
-        self.__running = False
         self.__main_switch = switch.Switch(Constants.MAIN_SWITCH_PIN.value)
         GPIO.add_event_detect(
             self.__main_switch.get_pin(),
@@ -73,14 +73,8 @@ class Controller:
             bouncetime = Constants.MAIN_SWITCH_DEBOUNCE_MS.value
         )
 
-    # Callback to run when the main switch is pressed
-    def switch_main(self, channel):
-        self.__running = not self.__running
-        if not self.__running:
-            self.shutdown()
-
-    # Start all functionality
-    def start(self):
+    # Main logic loop
+    def run(self):
         time_start = datetime.datetime.now()
         if not Constants.ISOLATED.value:
             self.__protocol.heartbeat()
@@ -89,52 +83,59 @@ class Controller:
         try:
             while True:
                 if self.__running:
-                    self.__main_belt.forward(Constants.MAIN_BELT_POWER.value)
-                    self.__sorting_belt.white()
-                    self.__gate_led.on()
-                    self.__color_led.off()
-                    while True:
-                        if self.__running:
-                            gate_reading = self.__phototransistor.get_reading(1)
-                            if gate_reading < Constants.LIGHT_GATE_VALUE.value:
-                                if Constants.ISOLATED.value or self.__protocol.can_pickup():
-                                    self.__color_led.on()
-                                    time.sleep(Constants.GATE_TO_COLOR_INTERVAL_S.value)
-                                    color_reading = self.__phototransistor.get_reading(0)
-                                    color = self.__phototransistor.get_color(color_reading)
-                                    self.__color_led.off()
-                                    if color == 1:
-                                        self.__sorting_belt.white()
-                                    elif color == 0:
-                                        self.__sorting_belt.black()
-                                    else:
-                                        continue  # log and error handling: disk has wrong color
-                                    time.sleep(Constants.COLOR_TO_ROBOT_INTERVAL_S.value)
-                                    self.__robot.arm_push_off()
+                    gate_reading = self.__phototransistor.get_reading(1)
+                    if gate_reading < Constants.LIGHT_GATE_VALUE.value:
+                        if Constants.ISOLATED.value or self.__protocol.can_pickup():
+                            self.__color_led.on()
+                            time.sleep(Constants.GATE_TO_COLOR_INTERVAL_S.value)
+                            color_reading = self.__phototransistor.get_reading(0)
+                            color = self.__phototransistor.get_color(color_reading)
+                            self.__color_led.off()
+                            if color == 1:
+                                self.__sorting_belt.white()
+                            elif color == 0:
+                                self.__sorting_belt.black()
+                            else:
+                                continue  # log and error handling: disk has wrong color
+                            time.sleep(Constants.COLOR_TO_ROBOT_INTERVAL_S.value)
+                            self.__robot.arm_push_off()
 
-                                    if not Constants.ISOLATED.value:
-                                        self.__protocol.picked_up_object()
-                                        self.__protocol.determined_object(color)
+                            if not Constants.ISOLATED.value:
+                                self.__protocol.picked_up_object()
+                                self.__protocol.determined_object(color)
 
-                                time.sleep(1) # TODO: calibrate or eliminate this interval
+                        time.sleep(1) # TODO: calibrate or eliminate this interval
 
-                            if not Constants.ISOLATED.value and (datetime.datetime.now() - last_heartbeat).seconds >= 3:
-                                self.__protocol.heartbeat()
-                                last_heartbeat = datetime.datetime.now()
+                    if not Constants.ISOLATED.value and (datetime.datetime.now() - last_heartbeat).seconds >= 3:
+                        self.__protocol.heartbeat()
+                        last_heartbeat = datetime.datetime.now()
 
-                            if (datetime.datetime.now() - time_start).seconds >= 180 or not self.__running:  # possible shutdown requirement
-                                break
-
-                        time.sleep(Constants.GATE_SENSOR_SENSE_INTERVAL_S.value)
-                else:
-                    time.sleep(Constants.GATE_SENSOR_SENSE_INTERVAL_S.value)
+                    if (datetime.datetime.now() - time_start).seconds >= 180 or not self.__running:  # possible shutdown requirement
+                        break
+                time.sleep(Constants.GATE_SENSOR_SENSE_INTERVAL_S.value)
         finally:
             self.shutdown() # shutdown if the controller exits unexpectedly
 
+    # Callback to run when the main switch is pressed
+    def switch_main(self, channel):
+        self.__running = not self.__running
+        if self.__running:
+            self.startup()
+        else:
+            self.shutdown()
+    
     # Method to run when a motor behaves unexpectedly
     def motor_panic(self, pin):
         self.__logger.log("Motor on pin " + str(pin) + " is behaving unexpectedly! Disabling functionality...")
         self.standby()
+
+    # Start functionality
+    def startup(self):
+        self.__gate_led.on()
+        self.__color_led.off()
+        self.__robot.arm_move_back()
+        self.__main_belt.forward(Constants.MAIN_BELT_POWER.value)
+        self.__sorting_belt.white()
 
     # Stop functionality
     def standby(self):

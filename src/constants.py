@@ -34,6 +34,7 @@ class Constants(Enum):
 
     # Timing
     MAIN_SWITCH_DEBOUNCE_MS: int = 200
+    ROBOT_SWITCH_DEBOUNCE_MS: int = 200
     VIB_SENSOR_DEBOUNCE_MS: int = 100
     GATE_SENSOR_SENSE_INTERVAL_S: float = 0.05
     GATE_TO_COLOR_INTERVAL_S: float = 0.2

@@ -4,6 +4,6 @@ import controller
 if __name__ == '__main__':
     try:
         GPIO.setmode(GPIO.BCM)
-        controller.Controller().start()
+        controller.Controller().run()
     finally:
         GPIO.cleanup()
