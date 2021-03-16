@@ -1,4 +1,4 @@
-# Class Led, contains Led light initalization + on + off commands.
+# Class Led, contains Led light initialization + on + off commands.
 import RPi.GPIO as GPIO
 
 

@@ -28,8 +28,8 @@ class Phototransistor:
     # white = 1, black = 0, other = -1 (protocol requirement)
     @staticmethod
     def get_color(reading: int):
-        if reading >= Constants.WHITE_RANGE_START.value and reading <= Constants.WHITE_RANGE_END.value:
+        if Constants.WHITE_RANGE_START.value <= reading <= Constants.WHITE_RANGE_END.value:
             return 1
-        if reading >= Constants.BLACK_RANGE_START.value and reading <= Constants.BLACK_RANGE_END.value:
+        if Constants.BLACK_RANGE_START.value <= reading <= Constants.BLACK_RANGE_END.value:
             return 0
         return -1

@@ -61,16 +61,18 @@ class Controller:
             Constants.PH_CS_PIN.value,
         )
         self.__logger = logger.Logger()
+        self.__main_switch = switch.Switch(Constants.MAIN_SWITCH_PIN.value)
+
         if not Constants.ISOLATED.value:
             self.__protocol = protocol.Protocol(self.__logger)
             self.__protocol.login()
             self.__logger.set_protocol(self.__protocol)
-        self.__main_switch = switch.Switch(Constants.MAIN_SWITCH_PIN.value)
+
         GPIO.add_event_detect(
             self.__main_switch.get_pin(),
             GPIO.RISING,
-            callback = self.switch_main,
-            bouncetime = Constants.MAIN_SWITCH_DEBOUNCE_MS.value
+            callback=self.switch_main,
+            bouncetime=Constants.MAIN_SWITCH_DEBOUNCE_MS.value
         )
 
     # Main logic loop
@@ -104,17 +106,17 @@ class Controller:
                                 self.__protocol.picked_up_object()
                                 self.__protocol.determined_object(color)
 
-                        time.sleep(1) # TODO: calibrate or eliminate this interval
+                        time.sleep(1)  # required sleep after picking up item (especially for protocol)
 
                     if not Constants.ISOLATED.value and (datetime.datetime.now() - last_heartbeat).seconds >= 3:
                         self.__protocol.heartbeat()
                         last_heartbeat = datetime.datetime.now()
 
-                    if (datetime.datetime.now() - time_start).seconds >= 180 or not self.__running:  # possible shutdown requirement
+                    if (datetime.datetime.now() - time_start).seconds >= 180:  # possible shutdown requirement
                         break
                 time.sleep(Constants.GATE_SENSOR_SENSE_INTERVAL_S.value)
         finally:
-            self.shutdown() # shutdown if the controller exits unexpectedly
+            self.shutdown()  # shutdown if the controller exits unexpectedly
 
     # Callback to run when the main switch is pressed
     def switch_main(self, channel):
@@ -123,7 +125,7 @@ class Controller:
             self.startup()
         else:
             self.shutdown()
-    
+
     # Method to run when a motor behaves unexpectedly
     def motor_panic(self, pin):
         self.__logger.log("Motor on pin " + str(pin) + " is behaving unexpectedly! Disabling functionality...")

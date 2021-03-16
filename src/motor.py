@@ -1,9 +1,8 @@
 from typing import Callable
 import RPi.GPIO as GPIO
 from time import sleep
+from constants import Constants
 
-def print_panic(pin: int):
-    print("Motor on pin " + str(pin) + " is behaving unexpectedly!")
 
 class Motor:
     __forward_pin: int = -1
@@ -15,15 +14,17 @@ class Motor:
     __moving: bool = False
     __controller = None
     __panic_func: Callable = None
+    __running: bool = False
 
     def __init__(
-        self,
-        forward_pin: int = -1,
-        backward_pin: int = -1,
-        enable_pin: int = -1,
-        vib_sens_pin: int = -1,
-        panic_func: Callable = print_panic,
+            self,
+            forward_pin: int = -1,
+            backward_pin: int = -1,
+            enable_pin: int = -1,
+            vib_sens_pin: int = -1,
+            panic_func: Callable = print_panic,
     ):
+        self.__running = False
         self.__loaded = (forward_pin > -1 and backward_pin > -1 and enable_pin > -1)
         if self.__loaded:
             self.__forward_pin = forward_pin
@@ -91,3 +92,7 @@ class Motor:
         elif power > 100:
             return 100
         return power
+
+    @staticmethod
+    def print_panic(pin: int):
+        print("Motor on pin " + str(pin) + " is behaving unexpectedly!")

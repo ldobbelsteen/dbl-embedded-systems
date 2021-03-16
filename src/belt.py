@@ -20,6 +20,7 @@ class Belt:
     def stop(self):
         self._motor.stop()
 
+
 # The belt that is used to sort (after being picked from the main belt)
 # inherits Belt
 class SortingBelt(Belt):
