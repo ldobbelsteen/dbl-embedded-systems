@@ -32,6 +32,13 @@ class Constants(Enum):
     # Main belt
     MAIN_BELT_POWER: int = 70
 
+    # Timing
+    MAIN_SWITCH_DEBOUNCE_MS: int = 200
+    VIB_SENSOR_DEBOUNCE_MS: int = 100
+    GATE_SENSOR_SENSE_INTERVAL_S: float = 0.05
+    GATE_TO_COLOR_INTERVAL_S: float = 0.2
+    COLOR_TO_ROBOT_INTERVAL_S: float = 0.4
+
     # Controller
     R_F_PIN: int = 9
     R_B_PIN: int = 11

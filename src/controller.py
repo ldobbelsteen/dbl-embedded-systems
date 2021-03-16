@@ -26,27 +26,61 @@ class Controller:
     __running: bool = False
 
     def __init__(self):
-        self.__robot = robot.Robot(motor.Motor(Constants.R_F_PIN.value, Constants.R_B_PIN.value, Constants.R_E_PIN.value),
-                                   switch.Switch(Constants.S_S_PIN.value), switch.Switch(Constants.S_A_PIN.value))
-        self.__sorting_belt = belt.SortingBelt(motor.Motor(Constants.SB_F_PIN.value, Constants.SB_B_PIN.value,
-                                                           Constants.SB_E_PIN.value, Constants.M_2_V_PIN.value, self.motor_disabled))
-        self.__main_belt = belt.Belt(motor.Motor(Constants.MB_F_PIN.value, Constants.MB_B_PIN.value,
-                                                 Constants.MB_E_PIN.value))
-        self.__phototransistor = phototransistor.Phototransistor(Constants.PH_CLK_PIN.value, Constants.PH_DOUT_PIN.value,
-                                                                 Constants.PH_DIN_PIN.value, Constants.PH_CS_PIN.value)
+        self.__robot = robot.Robot(
+            motor.Motor(
+                Constants.R_F_PIN.value,
+                Constants.R_B_PIN.value,
+                Constants.R_E_PIN.value,
+            ),
+            switch.Switch(Constants.S_S_PIN.value),
+            switch.Switch(Constants.S_A_PIN.value),
+        )
+        self.__sorting_belt = belt.SortingBelt(
+            motor.Motor(
+                Constants.SB_F_PIN.value,
+                Constants.SB_B_PIN.value,
+                Constants.SB_E_PIN.value,
+                Constants.M_2_V_PIN.value,
+                self.motor_panic,
+            )
+        )
+        self.__main_belt = belt.Belt(
+            motor.Motor(
+                Constants.MB_F_PIN.value,
+                Constants.MB_B_PIN.value,
+                Constants.MB_E_PIN.value,
+            )
+        )
+        self.__phototransistor = phototransistor.Phototransistor(
+            Constants.PH_CLK_PIN.value,
+            Constants.PH_DOUT_PIN.value,
+            Constants.PH_DIN_PIN.value,
+            Constants.PH_CS_PIN.value,
+        )
         self.__gate_led = led.Led(Constants.LED_G_PIN.value)
         self.__color_led = led.Led(Constants.LED_C_PIN.value)
-        self.__main_switch = switch.Switch(Constants.MAIN_SWITCH_PIN.value)
-        GPIO.add_event_detect(self.__main_switch.get_pin(), GPIO.RISING, callback=self.switch_main, bouncetime=200)
         self.__logger = logger.Logger()
         if not Constants.ISOLATED.value:
             self.__protocol = protocol.Protocol(self.__logger)
             self.__protocol.login()
             self.__logger.set_protocol(self.__protocol)
+        self.__running = False
+        self.__main_switch = switch.Switch(Constants.MAIN_SWITCH_PIN.value)
+        GPIO.add_event_detect(
+            self.__main_switch.get_pin(),
+            GPIO.RISING,
+            callback = self.switch_main,
+            bouncetime = Constants.MAIN_SWITCH_DEBOUNCE_MS.value
+        )
 
-        self.run()
+    # Callback to run when the main switch is pressed
+    def switch_main(self, channel):
+        self.__running = not self.__running
+        if not self.__running:
+            self.shutdown()
 
-    def run(self):
+    # Start all functionality
+    def start(self):
         time_start = datetime.datetime.now()
         if not Constants.ISOLATED.value:
             self.__protocol.heartbeat()
@@ -65,7 +99,7 @@ class Controller:
                             if gate_reading < Constants.LIGHT_GATE_VALUE.value:
                                 if Constants.ISOLATED.value or self.__protocol.can_pickup():
                                     self.__color_led.on()
-                                    time.sleep(0.2)
+                                    time.sleep(Constants.GATE_TO_COLOR_INTERVAL_S.value)
                                     color_reading = self.__phototransistor.get_reading(0)
                                     color = self.__phototransistor.get_color(color_reading)
                                     self.__color_led.off()
@@ -75,16 +109,14 @@ class Controller:
                                         self.__sorting_belt.black()
                                     else:
                                         continue  # log and error handling: disk has wrong color
-                                    time.sleep(0.4)
+                                    time.sleep(Constants.COLOR_TO_ROBOT_INTERVAL_S.value)
                                     self.__robot.arm_push_off()
 
                                     if not Constants.ISOLATED.value:
                                         self.__protocol.picked_up_object()
                                         self.__protocol.determined_object(color)
 
-                                time.sleep(1)
-
-                            time.sleep(0.05)
+                                time.sleep(1) # TODO: calibrate or eliminate this interval
 
                             if not Constants.ISOLATED.value and (datetime.datetime.now() - last_heartbeat).seconds >= 3:
                                 self.__protocol.heartbeat()
@@ -92,29 +124,27 @@ class Controller:
 
                             if (datetime.datetime.now() - time_start).seconds >= 180 or not self.__running:  # possible shutdown requirement
                                 break
-                        else:
-                            time.sleep(0.05)
-                else:
-                    time.sleep(0.05)
-        finally:
-            self.shutdown()
 
-    def motor_disabled(self):
-        self.__logger.log("Motor has been disabled.")
+                        time.sleep(Constants.GATE_SENSOR_SENSE_INTERVAL_S.value)
+                else:
+                    time.sleep(Constants.GATE_SENSOR_SENSE_INTERVAL_S.value)
+        finally:
+            self.shutdown() # shutdown if the controller exits unexpectedly
+
+    # Method to run when a motor behaves unexpectedly
+    def motor_panic(self, pin):
+        self.__logger.log("Motor on pin " + str(pin) + " is behaving unexpectedly! Disabling functionality...")
+        self.standby()
+
+    # Stop functionality
+    def standby(self):
         self.__running = False
         self.__gate_led.off()
         self.__color_led.off()
         self.__robot.arm_move_back()
         self.__sorting_belt.stop()
 
-    def switch_main(self, channel):
-        self.__running = not self.__running
-        if not self.__running:
-            self.shutdown()
-
+    # Turn everything off
     def shutdown(self):
-        self.__gate_led.off()
-        self.__color_led.off()
-        self.__robot.arm_move_back()
-        self.__sorting_belt.stop()
+        self.standby()
         self.__main_belt.stop()
