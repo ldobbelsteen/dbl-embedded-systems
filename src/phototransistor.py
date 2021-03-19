@@ -16,12 +16,6 @@ class Phototransistor:
             value = self.__mcp.read_adc(channel)
             return value
         return -1
-
-    def get_reading_difference(self, channel: int):
-        if self.__loaded:
-            value = self.__mcp.read_adc_difference(channel)
-            return value
-        return -1
     
     # Requires: making sure that there is constant a physical light on it, such that the brightness is
     # constant. Only returns the brightness
