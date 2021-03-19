@@ -38,7 +38,7 @@ class Constants(Enum):
     VIB_SENSOR_DEBOUNCE_MS: int = 100
     GATE_SENSOR_SENSE_INTERVAL_S: float = 0.05
     GATE_TO_COLOR_INTERVAL_S: float = 0.2
-    COLOR_TO_ROBOT_INTERVAL_S: float = 0.4
+    COLOR_TO_ROBOT_INTERVAL_S: float = 0.3
 
     # Controller
     R_F_PIN: int = 9
