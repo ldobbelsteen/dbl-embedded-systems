@@ -1,7 +1,8 @@
+from constants import Constants
+from threading import Timer
 from typing import Callable
 import RPi.GPIO as GPIO
 import time
-from constants import Constants
 
 def print_panic(pin: int):
     print("Motor on pin " + str(pin) + " is behaving unexpectedly!")
@@ -55,15 +56,23 @@ class Motor:
     # (meaning it is stably so). Then if it's low and the motor is supposed
     # to be running, run the panic function.
     def vib_fall(self, channel):
+        risen = False
         count = Constants.VIB_SENSOR_CHECK_COUNT.value
         total = Constants.VIB_SENSOR_DEBOUNCE_MS.value / 1000
-        for _ in range(count):
-            time.sleep(total / count)
-            if GPIO.input(self.__vib_sens_pin) != GPIO.LOW:
-                return
-        if self.__running:
-            self.__panic_func(channel)
-
+        chunk = total / count
+        def check_risen():
+            if GPIO.input(self.__vib_sens_pin) == GPIO.HIGH:
+                risen = True
+        def check_stable():
+            if not risen:
+                if self.__running:
+                    self.__panic_func(channel)
+        for i in range(count):
+            if i < count - 1:
+                Timer(i * chunk, check_risen).start()
+            else:
+                Timer(i * chunk, check_stable).start()
+        
     def change(self, forward: bool, power: int):
         if self.__loaded:
             power = self.__power_check(power)
