@@ -34,6 +34,8 @@ class Controller:
                 Constants.R_F_PIN.value,
                 Constants.R_B_PIN.value,
                 Constants.R_E_PIN.value,
+                #Constants.M_1_V_PIN.value,
+                #self.motor_panic,
             ),
             switch.Switch(Constants.S_S_PIN.value),
             switch.Switch(Constants.S_A_PIN.value),

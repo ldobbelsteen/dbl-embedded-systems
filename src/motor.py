@@ -1,10 +1,10 @@
 from typing import Callable
 import RPi.GPIO as GPIO
-from time import sleep
+import time
 from constants import Constants
 
 def print_panic(pin: int):
-        print("Motor on pin " + str(pin) + " is behaving unexpectedly!")
+    print("Motor on pin " + str(pin) + " is behaving unexpectedly!")
 
 
 class Motor:
@@ -45,28 +45,24 @@ class Motor:
                 GPIO.setup(self.__vib_sens_pin, GPIO.IN)
                 GPIO.add_event_detect(
                     self.__vib_sens_pin,
-                    GPIO.BOTH,
-                    callback=self.vib_state_changed,
+                    GPIO.FALLING,
+                    callback=self.vib_fall,
                     bouncetime=Constants.VIB_SENSOR_DEBOUNCE_MS.value)
 
             self.__pwm = GPIO.PWM(self.__enable_pin, 100)
 
-    # Handle change in the state of a vibration sensor
-    def vib_state_changed(self, channel):
-        state = GPIO.input(self.__vib_sens_pin) == GPIO.LOW
-
-        # During the sensor's debounce time, check if its state changes a few times.
-        # If it does change, the state is unstable and the callback is rejected
-        check_count = 10
-        for _ in range(check_count):
-            sleep(Constants.VIB_SENSOR_DEBOUNCE_MS.value / check_count)
-            if state != GPIO.input(self.__vib_sens_pin) == GPIO.LOW:
+    # If the vibration sensor falls, check a few times if it is still low
+    # (meaning it is stably so). Then if it's low and the motor is supposed
+    # to be running, run the panic function.
+    def vib_fall(self, channel):
+        count = Constants.VIB_SENSOR_CHECK_COUNT.value
+        total = Constants.VIB_SENSOR_DEBOUNCE_MS.value / 1000
+        for _ in range(count):
+            time.sleep(total / count)
+            if GPIO.input(self.__vib_sens_pin) != GPIO.LOW:
                 return
-
-        # If the state is stable, check if it coincides with the expected state.
-        # If it doesn't, run the panic function.
-        if state != self.__moving:
-            self.__panic_func()
+        if self.__running:
+            self.__panic_func(channel)
 
     def change(self, forward: bool, power: int):
         if self.__loaded:
@@ -78,13 +74,13 @@ class Motor:
 
     def __start(self, power):
         if self.__loaded:
-            self.__pwm.start(power)
             self.__running = True
+            self.__pwm.start(power)
 
     def stop(self):
         if self.__loaded:
-            self.__pwm.stop()
             self.__running = False
+            self.__pwm.stop()
 
     # robustness checking if the power is a valid value between 0 and 100.
     # why return only 0 and only 100?
