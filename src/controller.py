@@ -75,8 +75,6 @@ class Controller:
             bouncetime=Constants.MAIN_SWITCH_DEBOUNCE_MS.value
         )
 
-    # Main logic loop
-    def run(self):
         time_start = datetime.datetime.now()
         if not Constants.ISOLATED.value:
             self.__protocol.heartbeat()
@@ -120,11 +118,12 @@ class Controller:
 
     # Callback to run when the main switch is pressed
     def switch_main(self, channel):
-        self.__running = not self.__running
-        if self.__running:
+        if not self.__running:
             self.startup()
+            self.__running = True
         else:
             self.shutdown()
+            self.__running = False
 
     # Method to run when a motor behaves unexpectedly
     def motor_panic(self, pin):
