@@ -3,6 +3,9 @@ import RPi.GPIO as GPIO
 from time import sleep
 from constants import Constants
 
+def print_panic(pin: int):
+        print("Motor on pin " + str(pin) + " is behaving unexpectedly!")
+
 
 class Motor:
     __forward_pin: int = -1
@@ -44,7 +47,7 @@ class Motor:
                     self.__vib_sens_pin,
                     GPIO.BOTH,
                     callback=self.vib_state_changed,
-                    bouncetime=Constants.VIB_SENSOR_DEBOUNCE.value)
+                    bouncetime=Constants.VIB_SENSOR_DEBOUNCE_MS.value)
 
             self.__pwm = GPIO.PWM(self.__enable_pin, 100)
 
@@ -92,7 +95,3 @@ class Motor:
         elif power > 100:
             return 100
         return power
-
-    @staticmethod
-    def print_panic(pin: int):
-        print("Motor on pin " + str(pin) + " is behaving unexpectedly!")
