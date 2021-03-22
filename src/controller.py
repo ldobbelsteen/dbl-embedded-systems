@@ -11,6 +11,7 @@ import motor
 import protocol
 import logger
 import switch
+import object_detection
 
 
 class Controller:
@@ -23,6 +24,7 @@ class Controller:
     __main_switch: switch.Switch = None
     __protocol: protocol.Protocol = None
     __logger: logger.Logger = None
+    __object_detection: object_detection.ObjectDetection = None
     __running: bool = False
 
     def __init__(self):
@@ -64,6 +66,7 @@ class Controller:
         )
         self.__logger = logger.Logger()
         self.__main_switch = switch.Switch(Constants.MAIN_SWITCH_PIN.value)
+        self.__object_detection = object_detection.ObjectDetection(Constants.OO_DIRECTORY + Constants.OO_MODEL, Constants.OO_DIRECTORY + Constants.OO_LABELS, Constants.OO_CAMERA_WIDTH, Constants.OO_CAMERA_HEIGHT, Constants.OO_THRESHOLD)
 
         if not Constants.ISOLATED.value:
             self.__protocol = protocol.Protocol(self.__logger)
@@ -88,23 +91,24 @@ class Controller:
                     gate_reading = self.__phototransistor.get_reading(1)
                     if gate_reading < Constants.LIGHT_GATE_VALUE.value:
                         if Constants.ISOLATED.value or self.__protocol.can_pickup():
-                            self.__color_led.on()
-                            time.sleep(Constants.GATE_TO_COLOR_INTERVAL_S.value)
-                            color_reading = self.__phototransistor.get_reading(0)
-                            color = self.__phototransistor.get_color(color_reading)
-                            self.__color_led.off()
-                            if color == 1:
-                                self.__sorting_belt.white()
-                            elif color == 0:
-                                self.__sorting_belt.black()
-                            else:
-                                continue  # log and error handling: disk has wrong color
-                            time.sleep(Constants.COLOR_TO_ROBOT_INTERVAL_S.value)
-                            self.__robot.arm_push_off()
+                             if(Constants.CAMERA_CHECK and self.__object_detection.is_disk_detected()):
+                                self.__color_led.on()
+                                time.sleep(Constants.GATE_TO_COLOR_INTERVAL_S.value)
+                                color_reading = self.__phototransistor.get_reading(0)
+                                color = self.__phototransistor.get_color(color_reading)
+                                self.__color_led.off()
+                                if color == 1:
+                                    self.__sorting_belt.white()
+                                elif color == 0:
+                                    self.__sorting_belt.black()
+                                else:
+                                    continue  # log and error handling: disk has wrong color
+                                time.sleep(Constants.COLOR_TO_ROBOT_INTERVAL_S.value)
+                                self.__robot.arm_push_off()
 
-                            if not Constants.ISOLATED.value:
-                                self.__protocol.picked_up_object()
-                                self.__protocol.determined_object(color)
+                                if not Constants.ISOLATED.value:
+                                    self.__protocol.picked_up_object()
+                                    self.__protocol.determined_object(color)
 
                         time.sleep(1)  # required sleep after picking up item (especially for protocol)
 

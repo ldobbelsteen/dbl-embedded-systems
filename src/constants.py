@@ -4,6 +4,8 @@ from enum import Enum
 class Constants(Enum):
     # Isolated
     ISOLATED: bool = True
+    # On/Off Camera check
+    CAMERA_CHECK: bool = True
 
     # Protocol API
     API_URL: str = "https://brokenprotocol.xyz"
@@ -62,3 +64,12 @@ class Constants(Enum):
     MAIN_SWITCH_PIN: int = 22
     M_1_V_PIN: int = 2
     M_2_V_PIN: int = 4
+
+
+        #Object Detection model and labels.
+    OO_DIRECTORY: str = "object_detection/modules/dbl/"
+    OO_MODEL: str = "model.tflite"
+    OO_LABELS: str = "labels.txt"
+    OO_CAMERA_WIDTH: int = 640
+    OO_CAMERA_HEIGHT: int = 480
+    OO_THRESHOLD: float = 0.95
