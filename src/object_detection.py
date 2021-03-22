@@ -86,6 +86,16 @@ class ObjectDetection:
             'readable_score': str((tensor[1] / 255) * 100) + "%"
         }
         detected.append(disk_white)
+
+      three = tensor[2]
+      print("empty" +" " + str(round((three / 255) * 100, 2)) + "%")
+      if((three / 255) >= self.__THRESHOLD):
+        empty = {
+            'object': "empty",
+            'score': three / 255,
+            'readable_score': str((three / 255) * 100) + "%"
+        }
+        detected.append(empty)
       
       # print("sdcard" +" " + str(tensor[2] / 255))
       # if((tensor[2] / 255) >= self.__THRESHOLD):
@@ -140,7 +150,7 @@ class ObjectDetection:
 def main():
 #   #oo: ObjectDetection = ObjectDetection("object_detection/modules/default/model.tflite", "object_detection/modules/default/labels.txt", 640, 480, 0.2)
 #   #oo: ObjectDetection = ObjectDetection("object_detection/modules/teachablemachine/quantized/model.tflite", "object_detection/modules/teachablemachine/quantized/labels.txt", 480, 480, 0.4)
-  oo: ObjectDetection = ObjectDetection("object_detection/v4/model.tflite", "object_detection/v4/labels.txt", 480, 480, 1.0)
+  oo: ObjectDetection = ObjectDetection("object_detection/v5/model.tflite", "object_detection/v5/labels.txt", 480, 480, 1.0)
 #   print("initialized")
   while True:
     print(oo.get_detected_objects())
