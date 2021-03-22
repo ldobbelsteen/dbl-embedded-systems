@@ -1,0 +1,2 @@
+0 disk_black
+1 disk_white

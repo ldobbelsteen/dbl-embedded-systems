@@ -69,7 +69,7 @@ class ObjectDetection:
       # elif (index_of_maximum == 1):
       #   print("SDCard: " + percentage)
       print("disk_black" +" " + str(round((tensor[0] / 255) * 100, 2)) + "%")
-      if((tensor[0] / 255) >= self.__THRESHOLD):
+      if((tensor[0] / 255) >= 0.99):
         disk_black = {
           'object': "disk_black",
           'score': tensor[0] / 255,
@@ -140,7 +140,7 @@ class ObjectDetection:
 def main():
 #   #oo: ObjectDetection = ObjectDetection("object_detection/modules/default/model.tflite", "object_detection/modules/default/labels.txt", 640, 480, 0.2)
 #   #oo: ObjectDetection = ObjectDetection("object_detection/modules/teachablemachine/quantized/model.tflite", "object_detection/modules/teachablemachine/quantized/labels.txt", 480, 480, 0.4)
-  oo: ObjectDetection = ObjectDetection("object_detection/model.tflite", "object_detection/labels.txt", 480, 480, 0.95)
+  oo: ObjectDetection = ObjectDetection("object_detection/v2/model.tflite", "object_detection/v2/labels.txt", 480, 480, 0.95)
 #   print("initialized")
   while True:
     print(oo.get_detected_objects())
