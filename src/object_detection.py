@@ -72,8 +72,8 @@ class ObjectDetection:
       tensor_disk_white = tensor[1]
       tensor_empty = tensor[2]
       print("disk_black" +" " + str(round((tensor_disk_black / 255) * 100, 2)) + "%")
-      # if((tensor_disk_black / 255) >= self.__THRESHOLD):
-      if((tensor_disk_black / 255) >= 1.68):
+      if((tensor_disk_black / 255) >= self.__THRESHOLD):
+      # if((tensor_disk_black / 255) >= 1.68):
         disk_black = {
           'object': "disk_black",
           'score': tensor_disk_black / 255,
@@ -92,8 +92,8 @@ class ObjectDetection:
         detected.append(disk_white)
 
       print("empty" +" " + str(round((tensor_empty / 255) * 100, 2)) + "%")
-      # if((tensor_empty / 255) >= self.__THRESHOLD):
-      if (((tensor_disk_black / 255) <= 1.68) and  ((tensor_disk_white / 255) <= self.__THRESHOLD)):
+      if((tensor_empty / 255) >= self.__THRESHOLD):
+      # if (((tensor_disk_black / 255) <= 1.68) and  ((tensor_disk_white / 255) <= self.__THRESHOLD)):
         empty = {
             'object': "empty",
             'score': tensor_empty / 255,
