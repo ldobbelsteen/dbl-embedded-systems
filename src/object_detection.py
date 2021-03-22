@@ -144,6 +144,7 @@ def main():
 #   print("initialized")
   while True:
     print(oo.get_detected_objects())
+    time.sleep(0.5)
 #   print(oo.get_detected_objects())
   # print(oo.is_disk_detected())
 #   #oo.patrol()
