@@ -69,7 +69,7 @@ class ObjectDetection:
       # elif (index_of_maximum == 1):
       #   print("SDCard: " + percentage)
       print("disk_black" +" " + str(round((tensor[0] / 255) * 100, 2)) + "%")
-      if((tensor[0] / 255) >= self.__THRESHOLD):
+      if((tensor[0] / 255) >= 0.7):
         disk_black = {
           'object': "disk_black",
           'score': tensor[0] / 255,
@@ -79,7 +79,7 @@ class ObjectDetection:
 
 
       print("disk_white" +" " + str(round((tensor[1] / 255) * 100, 2)) + "%")
-      if((tensor[1] / 255) >= self.__THRESHOLD):
+      if((tensor[1] / 255) >= 0.9):
         disk_white = {
             'object': "disk_white",
             'score': tensor[1] / 255,
@@ -89,7 +89,7 @@ class ObjectDetection:
 
       three = tensor[2]
       print("empty" +" " + str(round((three / 255) * 100, 2)) + "%")
-      if((three / 255) >= self.__THRESHOLD):
+      if((three / 255) >= 0.2):
         empty = {
             'object': "empty",
             'score': three / 255,
