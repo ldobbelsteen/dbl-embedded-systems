@@ -93,7 +93,7 @@ class ObjectDetection:
 
       print("empty" +" " + str(round((tensor_empty / 255) * 100, 2)) + "%")
       # if((tensor_empty / 255) >= self.__THRESHOLD):
-      if (((tensor_disk_black / 255) >= 1.68) and  ((tensor_disk_white / 255) <= self.__THRESHOLD)):
+      if (((tensor_disk_black / 255) <= 1.68) and  ((tensor_disk_white / 255) <= self.__THRESHOLD)):
         empty = {
             'object': "empty",
             'score': tensor_empty / 255,
