@@ -15,7 +15,6 @@ class Motor:
     __vib_sens_pin: int = -1
     __pwm: GPIO.PWM = None
     __loaded: bool = False
-    __moving: bool = False
     __controller = None
     __panic_func: Callable = None
     __running: bool = False
@@ -62,6 +61,7 @@ class Motor:
         chunk = total / count
         def check_risen():
             if GPIO.input(self.__vib_sens_pin) == GPIO.HIGH:
+                nonlocal risen
                 risen = True
         def check_stable():
             if not risen:
