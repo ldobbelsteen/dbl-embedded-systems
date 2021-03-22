@@ -1,3 +1,2 @@
 0 disk_black
 1 dick_white
-2 sdcard

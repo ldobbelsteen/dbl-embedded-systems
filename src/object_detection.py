@@ -68,30 +68,32 @@ class ObjectDetection:
       #   print("Pencil: " + percentage)
       # elif (index_of_maximum == 1):
       #   print("SDCard: " + percentage)
-      print("disk_black" +" " + str(tensor[0] / 255))
+      print("disk_black" +" " + str(round((tensor[0] / 255) * 100, 2)) + "%")
       if((tensor[0] / 255) >= self.__THRESHOLD):
         disk_black = {
           'object': "disk_black",
-          'score': tensor[0] / 255
+          'score': tensor[0] / 255,
+          'readable_score': str((tensor[0] / 255) * 100) + "%"
           }
         detected.append(disk_black)
 
 
-      print("disk_white" +" " + str(tensor[1] / 255))
+      print("disk_white" +" " + str(round((tensor[1] / 255) * 100, 2)) + "%")
       if((tensor[1] / 255) >= self.__THRESHOLD):
         disk_white = {
             'object': "disk_white",
-            'score': tensor[1] / 255
+            'score': tensor[1] / 255,
+            'readable_score': str((tensor[1] / 255) * 100) + "%"
         }
         detected.append(disk_white)
       
-      print("sdcard" +" " + str(tensor[2] / 255))
-      if((tensor[2] / 255) >= self.__THRESHOLD):
-        sdcard = {
-            'object': "sdcard",
-            'score': tensor[2] / 255
-        }
-        detected.append(sdcard)
+      # print("sdcard" +" " + str(tensor[2] / 255))
+      # if((tensor[2] / 255) >= self.__THRESHOLD):
+      #   sdcard = {
+      #       'object': "sdcard",
+      #       'score': str(round((tensor[2] / 255) * 100, 2)) + "%"
+      #   }
+      #   detected.append(sdcard)
       # print(detected)
 
 
