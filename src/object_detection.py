@@ -68,15 +68,24 @@ class ObjectDetection:
       #   print("Pencil: " + percentage)
       # elif (index_of_maximum == 1):
       #   print("SDCard: " + percentage)
-      print("pencil" +" " + str(tensor[0] / 255))
+      print("disk_black" +" " + str(tensor[0] / 255))
       if((tensor[0] / 255) >= self.__THRESHOLD):
-        pencil = {
-          'object': "pencil",
+        disk_black = {
+          'object': "disk_black",
           'score': tensor[0] / 255
           }
-        detected.append(pencil)
+        detected.append(disk_black)
+
+
+      print("disk_white" +" " + str(tensor[1] / 255))
+      if((tensor[1] / 255) >= self.__THRESHOLD):
+        disk_white = {
+            'object': "disk_white",
+            'score': tensor[1] / 255
+        }
+        detected.append(disk_white)
       
-      print("sd card" +" " + str(tensor[1] / 255))
+      print("sdcard" +" " + str(tensor[1] / 255))
       if((tensor[1] / 255) >= self.__THRESHOLD):
         sdcard = {
             'object': "sdcard",
@@ -111,7 +120,7 @@ class ObjectDetection:
     detected = False
     detected_objects = self.get_detected_objects()
     for obj in detected_objects:
-      if obj["object"] == "sdcard":
+      if obj["object"] == "disk_black" or obj["object"] == "disk_white":
         detected = True
     #Check if detected object has disk 1 and disk 2.
     return detected
@@ -120,19 +129,21 @@ class ObjectDetection:
     detected = False
     detected_objects = self.get_detected_objects()
     for obj in detected_objects:
-      if obj["object"] == "pencil":
+      if obj["object"] == "sdcard":
         detected = True
     #Check if detected object has disk 1 and disk 2.
     return detected
 
 
-# def main():
+def main():
 #   #oo: ObjectDetection = ObjectDetection("object_detection/modules/default/model.tflite", "object_detection/modules/default/labels.txt", 640, 480, 0.2)
 #   #oo: ObjectDetection = ObjectDetection("object_detection/modules/teachablemachine/quantized/model.tflite", "object_detection/modules/teachablemachine/quantized/labels.txt", 480, 480, 0.4)
-#   oo: ObjectDetection = ObjectDetection("object_detection/modules/teachablemachine/v6/model.tflite", "object_detection/modules/teachablemachine/v6/labels.txt", 480, 480, 0.95)
+  oo: ObjectDetection = ObjectDetection("object_detection/model.tflite", "object_detection/labels.txt", 480, 480, 0.95)
 #   print("initialized")
+  while True:
+    print(oo.get_detected_objects())
 #   print(oo.get_detected_objects())
-#   print(oo.is_disk_detected())
+  # print(oo.is_disk_detected())
 #   #oo.patrol()
 
 if __name__ == '__main__':
