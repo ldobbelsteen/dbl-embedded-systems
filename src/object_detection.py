@@ -68,32 +68,36 @@ class ObjectDetection:
       #   print("Pencil: " + percentage)
       # elif (index_of_maximum == 1):
       #   print("SDCard: " + percentage)
-      print("disk_black" +" " + str(round((tensor[0] / 255) * 100, 2)) + "%")
-      if((tensor[0] / 255) >= self.__THRESHOLD):
+      tensor_disk_black = tensor[0]
+      tensor_disk_white = tensor[1]
+      tensor_empty = tensor[2]
+      print("disk_black" +" " + str(round((tensor_disk_black / 255) * 100, 2)) + "%")
+      # if((tensor_disk_black / 255) >= self.__THRESHOLD):
+      if((tensor_disk_black / 255) >= 1.68):
         disk_black = {
           'object': "disk_black",
-          'score': tensor[0] / 255,
-          'readable_score': str((tensor[0] / 255) * 100) + "%"
+          'score': tensor_disk_black / 255,
+          'readable_score': str((tensor_disk_black / 255) * 100) + "%"
           }
         detected.append(disk_black)
 
 
-      print("disk_white" +" " + str(round((tensor[1] / 255) * 100, 2)) + "%")
-      if((tensor[1] / 255) >= self.__THRESHOLD):
+      print("disk_white" +" " + str(round((tensor_disk_white / 255) * 100, 2)) + "%")
+      if((tensor_disk_white / 255) >= self.__THRESHOLD):
         disk_white = {
             'object': "disk_white",
-            'score': tensor[1] / 255,
-            'readable_score': str((tensor[1] / 255) * 100) + "%"
+            'score': tensor_disk_white / 255,
+            'readable_score': str((tensor_disk_white / 255) * 100) + "%"
         }
         detected.append(disk_white)
 
-      three = tensor[2]
-      print("empty" +" " + str(round((three / 255) * 100, 2)) + "%")
-      if((three / 255) >= self.__THRESHOLD):
+      print("empty" +" " + str(round((tensor_empty / 255) * 100, 2)) + "%")
+      # if((tensor_empty / 255) >= self.__THRESHOLD):
+      if (((tensor_disk_black / 255) >= 1.68) and  ((tensor_disk_white / 255) <= self.__THRESHOLD)):
         empty = {
             'object': "empty",
-            'score': three / 255,
-            'readable_score': str((three / 255) * 100) + "%"
+            'score': tensor_empty / 255,
+            'readable_score': str((tensor_empty / 255) * 100) + "%"
         }
         detected.append(empty)
       
