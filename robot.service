@@ -4,6 +4,7 @@ Description=DBL robot service
 [Service]
 Type=simple
 Restart=always
+RestartSec=5
 ExecStart=/usr/bin/python3 /home/pi/robot/src/main.py
 
 [Install]
