@@ -150,7 +150,7 @@ class ObjectDetection:
 def main():
 #   #oo: ObjectDetection = ObjectDetection("object_detection/modules/default/model.tflite", "object_detection/modules/default/labels.txt", 640, 480, 0.2)
 #   #oo: ObjectDetection = ObjectDetection("object_detection/modules/teachablemachine/quantized/model.tflite", "object_detection/modules/teachablemachine/quantized/labels.txt", 480, 480, 0.4)
-  oo: ObjectDetection = ObjectDetection("object_detection/v6/model.tflite", "object_detection/v6/labels.txt", 480, 480, 1.0)
+  oo: ObjectDetection = ObjectDetection("object_detection/v7/model.tflite", "object_detection/v7/labels.txt", 480, 480, 1.0)
 #   print("initialized")
   while True:
     print(oo.get_detected_objects())
