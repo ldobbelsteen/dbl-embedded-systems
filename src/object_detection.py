@@ -85,11 +85,11 @@ class ObjectDetection:
         }
         detected.append(disk_white)
       
-      print("sdcard" +" " + str(tensor[1] / 255))
-      if((tensor[1] / 255) >= self.__THRESHOLD):
+      print("sdcard" +" " + str(tensor[2] / 255))
+      if((tensor[2] / 255) >= self.__THRESHOLD):
         sdcard = {
             'object': "sdcard",
-            'score': tensor[1] / 255
+            'score': tensor[2] / 255
         }
         detected.append(sdcard)
       # print(detected)
