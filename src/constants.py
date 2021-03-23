@@ -18,19 +18,19 @@ class Constants(Enum):
 
     # Brightness values
     LIGHT_GATE_VALUE: int = 500
-    WHITE_RANGE_START: int = 150
+    WHITE_RANGE_START: int = 110
     WHITE_RANGE_END: int = 300
-    BLACK_RANGE_START: int = 30
-    BLACK_RANGE_END: int = 100
+    BLACK_RANGE_START: int = 20
+    BLACK_RANGE_END: int = 80
 
     # Timings
-    MAIN_SWITCH_DEBOUNCE_MS: int = 200
-    ROBOT_SWITCH_DEBOUNCE_MS: int = 200
-    VIB_SENSOR_DEBOUNCE_MS: int = 150
-    VIB_SENSOR_CHECK_COUNT: int = 20
+    MAIN_SWITCH_DEBOUNCE_MS: int = 500
+    ROBOT_SWITCH_DEBOUNCE_MS: int = 300
+    VIB_SENSOR_DEBOUNCE_MS: int = 300
+    VIB_SENSOR_CHECK_COUNT: int = 40
     GATE_SENSOR_SENSE_INTERVAL_S: float = 0.05
-    GATE_TO_COLOR_INTERVAL_S: float = 0.2
-    COLOR_TO_ROBOT_INTERVAL_S: float = 0.3
+    GATE_TO_COLOR_INTERVAL_S: float = 0.18
+    COLOR_TO_ROBOT_INTERVAL_S: float = 0.05
 
     # Electronics
     ROBOT_MOTOR_FORWARD_PIN: int = 9
@@ -59,7 +59,7 @@ class Constants(Enum):
 
     # Object detection
     OBJECT_DETECTION_ENABLED: bool = True
-    OBJECT_DETECTION_MODEL: str = "object_detection/model.tflite"
-    OBJECT_DETECTION_WHITE_THRESHOLD: float = 0.9
-    OBJECT_DETECTION_BLACK_THRESHOLD: float = 0.9
+    OBJECT_DETECTION_MODEL: str = "./object_detection/model.tflite"
+    OBJECT_DETECTION_WHITE_THRESHOLD: float = 0.7
+    OBJECT_DETECTION_BLACK_THRESHOLD: float = 0.7
     OBJECT_DETECTION_NONE_THRESHOLD: float = 0.2
