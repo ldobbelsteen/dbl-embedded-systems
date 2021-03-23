@@ -1,3 +1,0 @@
-0 disk_white
-1 disk_black
-2 empty

@@ -4,8 +4,6 @@ from enum import Enum
 class Constants(Enum):
     # Isolated
     ISOLATED: bool = True
-    # On/Off Camera check
-    CAMERA_CHECK: bool = True
 
     # Protocol API
     API_URL: str = "https://brokenprotocol.xyz"
@@ -25,16 +23,7 @@ class Constants(Enum):
     BLACK_RANGE_START: int = 30
     BLACK_RANGE_END: int = 100
 
-    # Robot
-    ROBOT_MOTOR_POWER: int = 100
-
-    # Sorting belt
-    SORTING_BELT_POWER: int = 100
-
-    # Main belt
-    MAIN_BELT_POWER: int = 70
-
-    # Timing
+    # Timings
     MAIN_SWITCH_DEBOUNCE_MS: int = 200
     ROBOT_SWITCH_DEBOUNCE_MS: int = 200
     VIB_SENSOR_DEBOUNCE_MS: int = 150
@@ -43,33 +32,31 @@ class Constants(Enum):
     GATE_TO_COLOR_INTERVAL_S: float = 0.2
     COLOR_TO_ROBOT_INTERVAL_S: float = 0.3
 
-    # Controller
-    R_F_PIN: int = 9
-    R_B_PIN: int = 11
-    R_E_PIN: int = 10
-    S_A_PIN: int = 13
-    S_S_PIN: int = 19
-    SB_F_PIN: int = 16
-    SB_B_PIN: int = 20
-    SB_E_PIN: int = 21
-    MB_F_PIN: int = 25
-    MB_B_PIN: int = 8
-    MB_E_PIN: int = 12
-    PH_CLK_PIN: int = 14
-    PH_DOUT_PIN: int = 15
-    PH_DIN_PIN: int = 18
-    PH_CS_PIN: int = 23
-    LED_G_PIN: int = 26
-    LED_C_PIN: int = 27
+    # Electronics
+    ROBOT_MOTOR_FORWARD_PIN: int = 9
+    ROBOT_MOTOR_BACKWARD_PIN: int = 11
+    ROBOT_MOTOR_ENABLE_PIN: int = 10
+    ROBOT_MOTOR_VIBRATION_PIN: int = 2
+    ROBOT_MOTOR_POWER: int = 100
+    ROBOT_ARRIVAL_SWITCH_PIN: int = 13
+    ROBOT_START_SWITCH_PIN: int = 19
+    SORTING_BELT_MOTOR_FORWARD_PIN: int = 16
+    SORTING_BELT_MOTOR_BACKWARD_PIN: int = 20
+    SORTING_BELT_MOTOR_ENABLE_PIN: int = 21
+    SORTING_BELT_VIBRATION_PIN: int = 4
+    SORTING_BELT_MOTOR_POWER: int = 100
+    MAIN_BELT_MOTOR_FORWARD_PIN: int = 25
+    MAIN_BELT_MOTOR_BACKWARD_PIN: int = 8
+    MAIN_BELT_MOTOR_ENABLE_PIN: int = 12
+    MAIN_BELT_MOTOR_POWER: int = 70
+    PHOTOTRANSISTOR_CLK_PIN: int = 14
+    PHOTOTRANSISTOR_DOUT_PIN: int = 15
+    PHOTOTRANSISTOR_DIN_PIN: int = 18
+    PHOTOTRANSISTOR_CS_PIN: int = 23
+    GATE_LIGHT_PIN: int = 26
+    COLOR_LIGHT_PIN: int = 27
     MAIN_SWITCH_PIN: int = 22
-    M_1_V_PIN: int = 2
-    M_2_V_PIN: int = 4
 
-
-        #Object Detection model and labels.
-    OO_DIRECTORY: str = "object_detection/modules/dbl/"
-    OO_MODEL: str = "model.tflite"
-    OO_LABELS: str = "labels.txt"
-    OO_CAMERA_WIDTH: int = 640
-    OO_CAMERA_HEIGHT: int = 480
-    OO_THRESHOLD: float = 0.95
+    # Object detection
+    OBJECT_DETECTION_ENABLED: bool = True
+    OBJECT_DETECTION_MODEL: str = "object_detection/model/v9.tflite"
