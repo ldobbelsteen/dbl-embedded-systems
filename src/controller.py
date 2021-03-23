@@ -131,6 +131,7 @@ class Controller:
     def switch_main(self, channel):
         if not self.__running:
             self.startup()
+            time.sleep(0.1) # wait for gate light to turn on
             self.__running = True
         else:
             self.shutdown()
@@ -154,7 +155,7 @@ class Controller:
         self.__running = False
         self.__gate_led.off()
         self.__color_led.off()
-        self.__robot.arm_move_back()
+        self.__robot.arm_back(0)
         self.__sorting_belt.stop()
 
     # Turn everything off
