@@ -42,6 +42,33 @@ class ObjectDetection:
     input_tensor = interpreter.tensor(tensor_index)()[0]
     input_tensor[:, :] = image
 
+  # def get_maximum(self, tensor):
+  #   #For looking which item is more prevelant.
+  #     # index_of_maximum = np.where(tensor == max(tensor))[0][0]
+  #     # percentage = str(round((tensor[index_of_maximum] / 255) * 100, 2)) + "%"
+  #     # if (index_of_maximum == 0):
+  #     #   print("Pencil: " + percentage)
+  #     # elif (index_of_maximum == 1):
+  #     #   print("SDCard: " + percentage)
+  #      #         if (index_of_maximum == 0):
+  #     #   print("Card: " + percentage)
+  #     # elif (index_of_maximum == 1):
+  #     #   print("Bowl: " + percentage)
+  #     # elif (index_of_maximum == 2):
+  #     #   print("Spray" + percentage)
+  #     # elif (index_of_maximum == 3):
+  #     #   print("Wood: " + percentage)
+
+  #       #Check self.__TRESHOLD if they meet and then return array.
+  #     # start
+      
+  #     #77.0 for later (IA).
+  #     # for obj in results:
+  #     #   if (obj['class_id'] == 33.0):
+  #     #     detected = True
+  #     # # end
+
+
   def get_detected_objects(self):
     detected = []
     interpreter = Interpreter(self.__MODEL_DIR)
@@ -61,16 +88,11 @@ class ObjectDetection:
       tussenstap = interpreter.get_output_details()
       output_details = tussenstap[0]
       tensor = np.squeeze(interpreter.get_tensor(output_details['index']))
-      #For looking which item is more prevelant.
-      # index_of_maximum = np.where(tensor == max(tensor))[0][0]
-      # percentage = str(round((tensor[index_of_maximum] / 255) * 100, 2)) + "%"
-      # if (index_of_maximum == 0):
-      #   print("Pencil: " + percentage)
-      # elif (index_of_maximum == 1):
-      #   print("SDCard: " + percentage)
+      
       tensor_disk_black = tensor[0]
       tensor_disk_white = tensor[1]
       tensor_empty = tensor[2]
+
       print("disk_black" +" " + str(round((tensor_disk_black / 255) * 100, 2)) + "%")
       if((tensor_disk_black / 255) >= self.__THRESHOLD):
       # if((tensor_disk_black / 255) >= 1.68):
@@ -100,34 +122,30 @@ class ObjectDetection:
             'readable_score': str((tensor_empty / 255) * 100) + "%"
         }
         detected.append(empty)
-      
-      # print("sdcard" +" " + str(tensor[2] / 255))
-      # if((tensor[2] / 255) >= self.__THRESHOLD):
-      #   sdcard = {
-      #       'object': "sdcard",
-      #       'score': str(round((tensor[2] / 255) * 100, 2)) + "%"
-      #   }
-      #   detected.append(sdcard)
-      # print(detected)
 
 
-      #         if (index_of_maximum == 0):
-      #   print("Card: " + percentage)
-      # elif (index_of_maximum == 1):
-      #   print("Bowl: " + percentage)
-      # elif (index_of_maximum == 2):
-      #   print("Spray" + percentage)
-      # elif (index_of_maximum == 3):
-      #   print("Wood: " + percentage)
+      if(len(tensor) > 2):
+        tensor_disk_black_back = tensor[3]
+        tensor_disk_white_back = tensor[4]
+        print("disk_black_back" +" " + str(round((tensor_disk_black_back / 255) * 100, 2)) + "%")
+        if((tensor_disk_black_back / 255) >= self.__THRESHOLD):
+          disk_black_back = {
+              'object': "empty",
+              'score': tensor_disk_black_back / 255,
+              'readable_score': str((tensor_disk_black_back / 255) * 100) + "%"
+          }
+          detected.append(disk_black_back)
+        
+        print("disk_white_back" +" " + str(round((tensor_disk_white_back / 255) * 100, 2)) + "%")
+        if((tensor_disk_white_back / 255) >= self.__THRESHOLD):
+          disk_white_back = {
+              'object': "empty",
+              'score': tensor_disk_white_back / 255,
+              'readable_score': str((tensor_disk_white_back / 255) * 100) + "%"
+          }
+          detected.append(disk_white_back)
 
-        #Check self.__TRESHOLD if they meet and then return array.
-      # start
-      
-      #77.0 for later (IA).
-      # for obj in results:
-      #   if (obj['class_id'] == 33.0):
-      #     detected = True
-      # # end
+     
       stream.seek(0)
       stream.truncate()
     return detected
@@ -136,7 +154,7 @@ class ObjectDetection:
     detected = False
     detected_objects = self.get_detected_objects()
     for obj in detected_objects:
-      if obj["object"] == "disk_black" or obj["object"] == "disk_white":
+      if obj["object"] == "disk_black" or obj["object"] == "disk_white" or obj["object"] == "disk_black_back" or obj["object"] == "disk_white_back":
         detected = True
     #Check if detected object has disk 1 and disk 2.
     return detected
