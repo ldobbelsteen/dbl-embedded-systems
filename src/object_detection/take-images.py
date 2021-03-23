@@ -15,4 +15,4 @@ total_time = 5
 for i in range(image_count):
 	print(str(round(100 * i / image_count, 2)) + "%")
 	camera.capture(output_directory + str(uuid.uuid4()) + ".jpg")
-	time.sleep(time / image_count)
+	time.sleep(total_time / image_count)
