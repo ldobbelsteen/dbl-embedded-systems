@@ -2,9 +2,12 @@
 Description=DBL robot service
 
 [Service]
+User=pi
+Group=pi
 Type=simple
-Restart=always
 RestartSec=5
+Restart=always
+WorkingDirectory=/home/pi/robot/src
 ExecStart=/usr/bin/python3 /home/pi/robot/src/main.py
 
 [Install]
