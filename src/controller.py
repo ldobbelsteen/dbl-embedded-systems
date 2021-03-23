@@ -11,6 +11,7 @@ import motor
 import protocol
 import logger
 import switch
+import detect
 
 
 class Controller:
@@ -24,46 +25,49 @@ class Controller:
     __protocol: protocol.Protocol = None
     __logger: logger.Logger = None
     __running: bool = False
+    __detect: detect.Detect = None
 
     def __init__(self):
         self.__running = False
-        self.__gate_led = led.Led(Constants.LED_G_PIN.value)
-        self.__color_led = led.Led(Constants.LED_C_PIN.value)
+        self.__gate_led = led.Led(Constants.GATE_LIGHT_PIN.value)
+        self.__color_led = led.Led(Constants.COLOR_LIGHT_PIN.value)
         self.__robot = robot.Robot(
             motor.Motor(
-                Constants.R_F_PIN.value,
-                Constants.R_B_PIN.value,
-                Constants.R_E_PIN.value,
-                Constants.M_1_V_PIN.value,
+                Constants.ROBOT_MOTOR_FORWARD_PIN.value,
+                Constants.ROBOT_MOTOR_BACKWARD_PIN.value,
+                Constants.ROBOT_MOTOR_ENABLE_PIN.value,
+                Constants.ROBOT_MOTOR_VIBRATION_PIN.value,
                 self.motor_panic,
             ),
-            switch.Switch(Constants.S_S_PIN.value),
-            switch.Switch(Constants.S_A_PIN.value),
+            switch.Switch(Constants.ROBOT_START_SWITCH_PIN.value),
+            switch.Switch(Constants.ROBOT_ARRIVAL_SWITCH_PIN.value),
         )
         self.__sorting_belt = belt.SortingBelt(
             motor.Motor(
-                Constants.SB_F_PIN.value,
-                Constants.SB_B_PIN.value,
-                Constants.SB_E_PIN.value,
-                Constants.M_2_V_PIN.value,
+                Constants.SORTING_BELT_MOTOR_FORWARD_PIN.value,
+                Constants.SORTING_BELT_MOTOR_BACKWARD_PIN.value,
+                Constants.SORTING_BELT_MOTOR_ENABLE_PIN.value,
+                Constants.SORTING_BELT_VIBRATION_PIN.value,
                 self.motor_panic,
             )
         )
         self.__main_belt = belt.Belt(
             motor.Motor(
-                Constants.MB_F_PIN.value,
-                Constants.MB_B_PIN.value,
-                Constants.MB_E_PIN.value,
+                Constants.MAIN_BELT_MOTOR_FORWARD_PIN.value,
+                Constants.MAIN_BELT_MOTOR_BACKWARD_PIN.value,
+                Constants.MAIN_BELT_MOTOR_ENABLE_PIN.value,
             )
         )
         self.__phototransistor = phototransistor.Phototransistor(
-            Constants.PH_CLK_PIN.value,
-            Constants.PH_DOUT_PIN.value,
-            Constants.PH_DIN_PIN.value,
-            Constants.PH_CS_PIN.value,
+            Constants.PHOTOTRANSISTOR_CLK_PIN.value,
+            Constants.PHOTOTRANSISTOR_DOUT_PIN.value,
+            Constants.PHOTOTRANSISTOR_DIN_PIN.value,
+            Constants.PHOTOTRANSISTOR_CS_PIN.value,
         )
         self.__logger = logger.Logger()
         self.__main_switch = switch.Switch(Constants.MAIN_SWITCH_PIN.value)
+        if Constants.OBJECT_DETECTION_ENABLED.value:
+            self.__detect = detect.Detect(Constants.OBJECT_DETECTION_MODEL.value)
 
         if not Constants.ISOLATED.value:
             self.__protocol = protocol.Protocol(self.__logger)
@@ -93,6 +97,11 @@ class Controller:
                             color_reading = self.__phototransistor.get_reading(0)
                             color = self.__phototransistor.get_color(color_reading)
                             self.__color_led.off()
+
+                            # Detect object and only print for now
+                            if self.__detect is not None:
+                                print(self.__detect.detect())
+
                             if color == 1:
                                 self.__sorting_belt.white()
                             elif color == 0:
@@ -137,7 +146,7 @@ class Controller:
         self.__gate_led.on()
         self.__color_led.off()
         self.__robot.arm_move_back()
-        self.__main_belt.forward(Constants.MAIN_BELT_POWER.value)
+        self.__main_belt.forward(Constants.MAIN_BELT_MOTOR_POWER.value)
         self.__sorting_belt.white()
 
     # Stop functionality
