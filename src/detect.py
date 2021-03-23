@@ -46,7 +46,6 @@ class Detect:
         black_disk_confidence = (tensor[0] / 255)
         white_disk_confidence = (tensor[1] / 255)
         no_disk_confidence = (tensor[2] / 255)
-        print(black_disk_confidence, white_disk_confidence, no_disk_confidence)
 
         # Determine image class with highest confidence
         if white_disk_confidence >= Constants.OBJECT_DETECTION_WHITE_THRESHOLD.value:
@@ -57,9 +56,3 @@ class Detect:
             return "none"
         else:
             return "unknown"
-
-if __name__ == '__main__':
-    detection = Detect("object_detection/model/v9.tflite")
-    while True:
-        print(detection.detect())
-        time.sleep(1)
