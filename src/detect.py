@@ -8,17 +8,18 @@ import picamera
 
 from PIL import Image
 from tflite_runtime.interpreter import Interpreter
+from constants import Constants
 
 class Detect:
     __interpreter = None
-    _camera = None
+    __camera = None
 
     def __init__(self, model_file: str = ""):
         self.__loaded = (model_file != "")
         if self.__loaded:
             self.__interpreter = Interpreter(model_file)
             self.__interpreter.allocate_tensors()
-            self.__camera = picamera.PiCamera(resolution=(960, 960), framerate=30)
+            self.__camera = picamera.PiCamera(resolution = (480, 480), framerate = 30)
             time.sleep(2)
 
     def set_input_tensor(self, interpreter, image):
@@ -48,11 +49,11 @@ class Detect:
         print(black_disk_confidence, white_disk_confidence, no_disk_confidence)
 
         # Determine image class with highest confidence
-        if white_disk_confidence >= 0.9:
+        if white_disk_confidence >= Constants.OBJECT_DETECTION_WHITE_THRESHOLD.value:
             return "white"
-        elif black_disk_confidence >= 0.5:
+        elif black_disk_confidence >= Constants.OBJECT_DETECTION_BLACK_THRESHOLD.value:
             return "black"
-        elif no_disk_confidence >= 0.4:
+        elif no_disk_confidence >= Constants.OBJECT_DETECTION_NONE_THRESHOLD.value:
             return "none"
         else:
             return "unknown"
@@ -61,4 +62,4 @@ if __name__ == '__main__':
     detection = Detect("object_detection/model/v9.tflite")
     while True:
         print(detection.detect())
-        time.sleep(0.3)
+        time.sleep(1)

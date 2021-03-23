@@ -6,7 +6,7 @@ from pathlib import Path
 output_directory = "./images/black_disk/"
 Path(output_directory).mkdir(parents=True, exist_ok=True)
 
-camera = picamera.PiCamera(resolution = (960, 960), framerate = 30)
+camera = picamera.PiCamera(resolution = (480, 480), framerate = 30)
 camera.start_preview()
 time.sleep(2)
 
