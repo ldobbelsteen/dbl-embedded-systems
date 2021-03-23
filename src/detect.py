@@ -20,7 +20,6 @@ class Detect:
             self.__interpreter = Interpreter(model_file)
             self.__interpreter.allocate_tensors()
             self.__camera = picamera.PiCamera(resolution = (480, 480), framerate = 30)
-            time.sleep(2)
 
     def set_input_tensor(self, interpreter, image):
         tensor_index = interpreter.get_input_details()[0]['index']

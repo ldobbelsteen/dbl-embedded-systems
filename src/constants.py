@@ -59,7 +59,7 @@ class Constants(Enum):
 
     # Object detection
     OBJECT_DETECTION_ENABLED: bool = True
-    OBJECT_DETECTION_MODEL: str = "object_detection/model/v9.tflite"
+    OBJECT_DETECTION_MODEL: str = "object_detection/model.tflite"
     OBJECT_DETECTION_WHITE_THRESHOLD: float = 0.9
     OBJECT_DETECTION_BLACK_THRESHOLD: float = 0.9
     OBJECT_DETECTION_NONE_THRESHOLD: float = 0.2
