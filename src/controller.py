@@ -36,8 +36,8 @@ class Controller:
                 Constants.ROBOT_MOTOR_FORWARD_PIN.value,
                 Constants.ROBOT_MOTOR_BACKWARD_PIN.value,
                 Constants.ROBOT_MOTOR_ENABLE_PIN.value,
-                #Constants.ROBOT_MOTOR_VIBRATION_PIN.value,
-                #self.motor_panic,
+                Constants.ROBOT_MOTOR_VIBRATION_PIN.value,
+                self.motor_panic,
             ),
             switch.Switch(Constants.ROBOT_START_SWITCH_PIN.value),
             switch.Switch(Constants.ROBOT_ARRIVAL_SWITCH_PIN.value),
@@ -95,36 +95,42 @@ class Controller:
                             self.__color_led.on()
                             time.sleep(Constants.GATE_TO_COLOR_INTERVAL_S.value)
                             color_reading = self.__phototransistor.get_reading(0)
-                            print(color_reading)
                             color = self.__phototransistor.get_color(color_reading)
                             self.__color_led.off()
 
+                            no_error = False
                             if self.__detect is not None:
                                 detected = self.__detect.detect()
-                                print("Object detection system detected: " + self.__detect.detect())
-                                print("Color detection system detected: " + str(color))
-                                print(" ")
+                                self.__logger.log("Object detection system detected: " + str(self.__detect.detect()))
+                                self.__logger.log("Color detection system detected: " + str(color))
                                 if detected == "white":
                                     if color == 1:
                                         self.__sorting_belt.white()
+                                        no_error = True
                                     else:
-                                        continue # log and error handling: light sensor and camera detect differ
+                                        # log and error handling: light sensor and camera detect differ
+                                        self.__logger.log("Detection discrepancy between object and color detection.")
                                 elif detected == "black":
                                     if color == 0:
                                         self.__sorting_belt.black()
+                                        no_error = True
                                     else:
-                                        continue # log and error handling: light sensor and camera detect differ
+                                        # log and error handling: light sensor and camera detect differ
+                                        self.__logger.log("Detection discrepancy between object and color detection.")
                                 elif detected == "none":
-                                    continue # log and error handling: no object or wrong color
+                                    # log and error handling: no object or wrong color
+                                    self.__logger.log("No object has been found.")
                                 elif detected == "unknown":
-                                    continue # log and error handling: unknown object 
+                                    # log and error handling: unknown object
+                                    self.__logger.log("The detected object is not a disk.")
 
-                            time.sleep(Constants.COLOR_TO_ROBOT_INTERVAL_S.value)
-                            self.__robot.arm_push_off()
+                            if no_error:
+                                time.sleep(Constants.COLOR_TO_ROBOT_INTERVAL_S.value)
+                                self.__robot.arm_push_off()
 
-                            if not Constants.ISOLATED.value:
-                                self.__protocol.picked_up_object()
-                                self.__protocol.determined_object(color)
+                                if not Constants.ISOLATED.value:
+                                    self.__protocol.picked_up_object()
+                                    self.__protocol.determined_object(color)
 
                         time.sleep(1)  # required sleep after picking up item (especially for protocol)
 
@@ -142,7 +148,7 @@ class Controller:
     def switch_main(self, channel):
         if not self.__running:
             self.startup()
-            time.sleep(0.1) # wait for gate light to turn on
+            time.sleep(0.1)  # wait for gate light to turn on
             self.__running = True
         else:
             self.shutdown()
