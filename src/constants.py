@@ -2,10 +2,9 @@ from enum import Enum
 
 
 class Constants(Enum):
-    # Isolated
-    ISOLATED: bool = False
 
     # Protocol API
+    USE_API: bool = True
     API_URL: str = "https://brokenprotocol.xyz"
     ENDPOINT_AUTH_LOGIN: str = "/Authentication/Login"
     ENDPOINT_DEVICE_HEARTBEAT: str = "/Device/Heartbeat"
@@ -16,14 +15,14 @@ class Constants(Enum):
     ENDPOINT_DEVICE_LOG: str = "/Device/Log"
     ENDPOINT_DEVICE_SENSORDATA: str = "/Device/SensorData"
 
-    # Brightness values
+    # Brightness values/ranges
     LIGHT_GATE_VALUE: int = 250
     WHITE_RANGE_START: int = 100
     WHITE_RANGE_END: int = 300
     BLACK_RANGE_START: int = 20
     BLACK_RANGE_END: int = 80
 
-    # Timings
+    # General timings
     MAIN_SWITCH_DEBOUNCE_MS: int = 500
     ROBOT_SWITCH_DEBOUNCE_MS: int = 300
     VIB_SENSOR_DEBOUNCE_MS: int = 300
@@ -32,7 +31,7 @@ class Constants(Enum):
     GATE_TO_COLOR_INTERVAL_S: float = 0.18
     COLOR_TO_ROBOT_INTERVAL_S: float = 0.05
 
-    # Electronics
+    # Electronics configuration
     ROBOT_MOTOR_FORWARD_PIN: int = 9
     ROBOT_MOTOR_BACKWARD_PIN: int = 11
     ROBOT_MOTOR_ENABLE_PIN: int = 10
@@ -58,7 +57,6 @@ class Constants(Enum):
     MAIN_SWITCH_PIN: int = 22
 
     # Object detection
-    OBJECT_DETECTION_ENABLED: bool = True
     OBJECT_DETECTION_MODEL: str = "./object_detection/model.tflite"
     OBJECT_DETECTION_WHITE_THRESHOLD: float = 0.7
     OBJECT_DETECTION_BLACK_THRESHOLD: float = 0.7

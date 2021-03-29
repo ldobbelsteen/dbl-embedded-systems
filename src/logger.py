@@ -15,7 +15,7 @@ class Logger:
         logs = logs + message
         # print on terminal
         print(logs)
-        if not Constants.ISOLATED.value or self.__protocol is not None:
+        if self.__protocol is not None:
             # send to API
             self.__protocol.log(message, tags)
 

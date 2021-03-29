@@ -2,15 +2,64 @@ import requests
 import json
 import time
 import logger
+from threading import Timer
 from constants import Constants
 
 
 class Protocol:
-    __token = None
     __logger = None
+    __token = None
+    __active = None
+    __can_pickup = None
 
-    def __init__(self, log: logger.Logger):
-        self.__logger = log
+    def __init__(self, logger):
+        self.__logger = logger
+        self.__token = self.login()
+        self.__active = False
+        self.__can_pickup = False
+
+    def login(self):
+        headers = {'Content-Type': 'application/json'}
+        data = {'User': 'group4', 'Password': 'HNTS79MA0E'}
+        res = self.__post_request(
+            Constants.ENDPOINT_AUTH_LOGIN.value, headers, data, False)
+        return str(res['Token'])
+
+    def start(self):
+        if self.__active:
+            # Update pick up status
+            Timer(1, self.start).start()
+            self.__can_pickup = self.__get_request(
+                Constants.ENDPOINT_DEVICE_CANPICKUP.value)
+        else:
+            # Send heartbeat
+            Timer(5, self.start).start()
+            self.__get_request(
+                Constants.ENDPOINT_DEVICE_HEARTBEAT.value, {}, True, False)
+
+    def set_active(self, active: bool):
+        self.__active = active
+
+    def can_pickup(self):
+        cp = self.__can_pickup
+        if not cp:
+            self.__logger.log("Pickup blocked by the API!")
+        return cp
+
+    def picked_up(self, color: int):
+        self.__post_request(Constants.ENDPOINT_DEVICE_PICKEDUPOBJECT.value)
+        headers = {'Content-Type': 'application/json'}
+        data = {'Color': color}
+        self.__post_request(
+            Constants.ENDPOINT_DETERMINED_OBJECT.value, headers, data)
+
+    def log(self, message: str, tags: list):
+        headers = {'Content-Type': 'application/json'}
+        data = {'Tags': tags, 'Message': message}
+        res = self.__post_request(
+            Constants.ENDPOINT_DEVICE_LOG.value, headers, data)
+        # check if succes code 200 is return or not. Or maybe checking inside __post_request (error handler).
+        return res
 
     def __check_response_status(self, status_code: int):
         # here error handler
@@ -59,95 +108,3 @@ class Protocol:
         # todo-> Check status code before returning (error handling) 200 good, but when it returns lik 400 then it is
         #  error.
         return dictResp
-
-    def login(self):
-        headers = {'Content-Type': 'application/json'}
-        data = {'User': 'group4', 'Password': 'HNTS79MA0E'}
-        dictResp = self.__post_request(
-            Constants.ENDPOINT_AUTH_LOGIN.value, headers, data, False)
-        self.__token = str(dictResp['Token'])
-        self.__logger.log("The following Token is stored:\n" +
-                          self.__token, ["Success", "Token"])
-
-    def heartbeat(self):
-        if self.__token is not None:
-            self.__get_request(
-                Constants.ENDPOINT_DEVICE_HEARTBEAT.value, {}, True, False)
-            self.__logger.log("API Successfully Responded Heartbeat.", [
-                              "Success", "Heartbeat"])
-            # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
-
-    def can_pickup(self):
-        if self.__token is not None:
-            dictResp = self.__get_request(
-                Constants.ENDPOINT_DEVICE_CANPICKUP.value)
-            # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
-            self.__logger.log("API Successfully Responded Can_Pickup:\n" +
-                              str(dictResp), ["Success", "Can_Pickup"])
-            return dictResp
-
-    def picked_up_object(self):
-        if self.__token is not None:
-            dictResp = self.__post_request(
-                Constants.ENDPOINT_DEVICE_PICKEDUPOBJECT.value)
-            self.__logger.log("API Successfully Responded Picked_Up_Object:\n" +
-                              str(dictResp), ["Success", "Picked_Up_Object"])
-            return dictResp
-
-    def put_back_object(self):
-        if self.__token is not None:
-            dictResp = self.__post_request(
-                Constants.ENDPOINT_DEVICE_PUTBACKOBJECT.value)
-            self.__logger.log("API Successfully Responded Put_Back_Object:\n" +
-                              str(dictResp), ["Success", "Put_Back_Object"])
-            return dictResp
-
-    def determined_object(self, color: int):
-        if self.__token is not None:
-            headers = {'Content-Type': 'application/json'}
-            data = {'Color': color}
-            dictResp = self.__post_request(
-                Constants.ENDPOINT_DETERMINED_OBJECT.value, headers, data)
-            # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
-            self.__logger.log("API Successfully Responded Determined_Object:\n" +
-                              str(dictResp), ["Success", "Determined_Object"])
-            return dictResp
-
-    def log(self, message: str, tags: list):
-        if self.__token is not None:
-            headers = {'Content-Type': 'application/json'}
-            data = {'Tags': tags, 'Message': message}
-            dictResp = self.__post_request(
-                Constants.ENDPOINT_DEVICE_LOG.value, headers, data)
-            # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
-            return dictResp
-
-    def sensor_data(self, data: dict):
-        if self.__token is not None:
-            headers = {'Content-Type': 'application/json'}
-            data = {'Data': data}
-            dictResp = self.__post_request(
-                Constants.ENDPOINT_DEVICE_SENSORDATA.value, headers, data)
-            # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
-            self.__logger.log("API Successfully Responded Sensor_Data:\n" +
-                              str(dictResp), ["Success", "Sensor_Data"])
-            return dictResp
-
-
-if __name__ == '__main__':
-    logger = logger.Logger()
-    protocol = Protocol(logger)
-    protocol.login()
-    protocol.heartbeat()
-    while True:
-        can_pickup = protocol.can_pickup()
-        protocol.heartbeat()
-        print(can_pickup)
-        if can_pickup:
-            break
-        time.sleep(2)
-    protocol.picked_up_object()
-    protocol.put_back_object()
-    protocol.determined_object(0)
-    protocol.log("This is a test message", ["test"])
-    protocol.sensor_data({'test': 'test_data'})
