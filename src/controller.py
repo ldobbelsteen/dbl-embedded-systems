@@ -72,8 +72,8 @@ class Controller:
 
         if not Constants.ISOLATED.value:
             self.__protocol = protocol.Protocol(self.__logger)
-            self.__protocol.login()
             self.__logger.set_protocol(self.__protocol)
+            self.__protocol.login()
 
         GPIO.add_event_detect(
             self.__main_switch.get_pin(),
@@ -93,6 +93,7 @@ class Controller:
                     gate_reading = self.__phototransistor.get_reading(1)
                     if gate_reading < Constants.LIGHT_GATE_VALUE.value:
                         if Constants.ISOLATED.value or self.__protocol.can_pickup():
+                            print("aight")
                             self.__color_led.on()
                             time.sleep(
                                 Constants.GATE_TO_COLOR_INTERVAL_S.value)
