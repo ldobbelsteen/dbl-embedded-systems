@@ -3,62 +3,63 @@ import json
 import time
 import logger
 from threading import Timer
+from datetime import datetime
 from constants import Constants
 
 
 class Protocol:
-    __logger = None
     __token = None
-    __active = None
-    __can_pickup = None
+    __logger = None
+    __pickup_next = None
 
     def __init__(self, logger):
         self.__logger = logger
-        self.__token = self.login()
-        self.__active = False
-        self.__can_pickup = False
+        self.login()
+        self.heartbeat()
+        self.pickup_check()
 
+    # Log in by getting a token
     def login(self):
         headers = {'Content-Type': 'application/json'}
         data = {'User': 'group4', 'Password': 'HNTS79MA0E'}
         res = self.__post_request(
             Constants.ENDPOINT_AUTH_LOGIN.value, headers, data, False)
-        return str(res['Token'])
+        self.__token = str(res['Token'])
 
-    def start(self):
-        if self.__active:
-            # Update pick up status
-            Timer(1, self.start).start()
-            self.__can_pickup = self.__get_request(
-                Constants.ENDPOINT_DEVICE_CANPICKUP.value)
-        else:
-            # Send heartbeat
-            Timer(5, self.start).start()
-            self.__get_request(
-                Constants.ENDPOINT_DEVICE_HEARTBEAT.value, {}, True, False)
+    # Send heartbeat and keep doing so
+    def heartbeat(self):
+        self.__get_request(
+            Constants.ENDPOINT_DEVICE_HEARTBEAT.value, {}, True, False)
+        Timer(4, self.heartbeat).start()
 
-    def set_active(self, active: bool):
-        self.__active = active
+    # Keep checking if next disk can be picked up until it can
+    def pickup_check(self):
+        self.__pickup_next = self.__get_request(
+            Constants.ENDPOINT_DEVICE_CANPICKUP.value)
+        if not self.__pickup_next:
+            Timer(1, self.pickup_check).start()
 
+    # Check if disk can be picked up right now
     def can_pickup(self):
-        cp = self.__can_pickup
-        if not cp:
-            self.__logger.log("Pickup blocked by the API!")
-        return cp
+        return self.__pickup_next
 
+    # Send that disk of color has been picked up
     def picked_up(self, color: int):
         self.__post_request(Constants.ENDPOINT_DEVICE_PICKEDUPOBJECT.value)
         headers = {'Content-Type': 'application/json'}
         data = {'Color': color}
         self.__post_request(
             Constants.ENDPOINT_DETERMINED_OBJECT.value, headers, data)
+        self.__pickup_next = False
+        self.pickup_check()
 
+    # Send a log with tags to the protocol
     def log(self, message: str, tags: list):
         headers = {'Content-Type': 'application/json'}
         data = {'Tags': tags, 'Message': message}
         res = self.__post_request(
             Constants.ENDPOINT_DEVICE_LOG.value, headers, data)
-        # check if succes code 200 is return or not. Or maybe checking inside __post_request (error handler).
+        # check if success code 200 is returned or not. Or maybe checking inside __post_request (error handler)
         return res
 
     def __check_response_status(self, status_code: int):

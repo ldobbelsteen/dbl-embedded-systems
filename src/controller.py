@@ -72,7 +72,6 @@ class Controller:
         if Constants.USE_API.value:
             self.__protocol = protocol.Protocol(self.__logger)
             self.__logger.set_protocol(self.__protocol)
-            self.__protocol.start()
 
         GPIO.add_event_detect(
             self.__main_switch.get_pin(),
@@ -131,6 +130,8 @@ class Controller:
 
                                 if self.__protocol is not None:
                                     self.__protocol.picked_up(color)
+                        else:
+                            self.__logger.log("Pickup blocked by the API!")
 
                     # possible shutdown requirement
                     if (datetime.datetime.now() - time_start).seconds >= 180:
@@ -158,7 +159,6 @@ class Controller:
 
     # Start functionality
     def startup(self):
-        self.__protocol.set_active(True)
         self.__gate_led.on()
         self.__color_led.off()
         self.__robot.arm_move_back()
@@ -167,7 +167,6 @@ class Controller:
 
     # Stop functionality
     def standby(self):
-        self.__protocol.set_active(False)
         self.__running = False
         self.__gate_led.off()
         self.__color_led.off()
