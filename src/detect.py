@@ -52,11 +52,11 @@ class Detect:
         no_disk_confidence = (tensor[2] / 255)
 
         # Determine image class with highest confidence
-        if white_disk_confidence >= Constants.OBJECT_DETECTION_WHITE_THRESHOLD.value:
+        if no_disk_confidence >= Constants.OBJECT_DETECTION_NONE_THRESHOLD.value:
+            return "none"
+        elif white_disk_confidence >= Constants.OBJECT_DETECTION_WHITE_THRESHOLD.value:
             return "white"
         elif black_disk_confidence >= Constants.OBJECT_DETECTION_BLACK_THRESHOLD.value:
             return "black"
-        elif no_disk_confidence >= Constants.OBJECT_DETECTION_NONE_THRESHOLD.value:
-            return "none"
         else:
             return "unknown"
