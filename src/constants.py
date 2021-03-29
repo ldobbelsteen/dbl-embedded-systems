@@ -17,8 +17,8 @@ class Constants(Enum):
     ENDPOINT_DEVICE_SENSORDATA: str = "/Device/SensorData"
 
     # Brightness values
-    LIGHT_GATE_VALUE: int = 500
-    WHITE_RANGE_START: int = 110
+    LIGHT_GATE_VALUE: int = 250
+    WHITE_RANGE_START: int = 100
     WHITE_RANGE_END: int = 300
     BLACK_RANGE_START: int = 20
     BLACK_RANGE_END: int = 80
