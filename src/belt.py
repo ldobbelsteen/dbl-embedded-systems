@@ -1,4 +1,4 @@
-## Contains belt (for main belt), and this file contains SortingBelt (inherits belt).
+# Contains belt (for main belt), and this file contains SortingBelt (inherits belt).
 import motor
 from constants import Constants
 

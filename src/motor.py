@@ -4,6 +4,7 @@ from typing import Callable
 import RPi.GPIO as GPIO
 import time
 
+
 def print_panic(pin: int):
     print("Motor on pin " + str(pin) + " is behaving unexpectedly!")
 
@@ -28,7 +29,8 @@ class Motor:
             panic_func: Callable = print_panic,
     ):
         self.__running = False
-        self.__loaded = (forward_pin > -1 and backward_pin > -1 and enable_pin > -1)
+        self.__loaded = (
+            forward_pin > -1 and backward_pin > -1 and enable_pin > -1)
         if self.__loaded:
             self.__forward_pin = forward_pin
             self.__backward_pin = backward_pin
@@ -59,10 +61,12 @@ class Motor:
         count = Constants.VIB_SENSOR_CHECK_COUNT.value
         total = Constants.VIB_SENSOR_DEBOUNCE_MS.value / 1000
         chunk = total / count
+
         def check_risen():
             if GPIO.input(self.__vib_sens_pin) == GPIO.HIGH:
                 nonlocal risen
                 risen = True
+
         def check_stable():
             if not risen:
                 if self.__running:
@@ -72,7 +76,7 @@ class Motor:
                 Timer(i * chunk, check_risen).start()
             else:
                 Timer(i * chunk, check_stable).start()
-        
+
     def change(self, forward: bool, power: int):
         if self.__loaded:
             power = self.__power_check(power)

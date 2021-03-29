@@ -27,7 +27,8 @@ class Protocol:
 
         tries = 0
         while tries < 20:
-            response = requests.get(Constants.API_URL.value + endpoint, headers=headers)
+            response = requests.get(
+                Constants.API_URL.value + endpoint, headers=headers)
             if self.__check_response_status(response.status_code):
                 break
             tries = tries + 1
@@ -47,7 +48,8 @@ class Protocol:
 
         tries = 0
         while tries < 20:
-            response = requests.post(Constants.API_URL.value + endpoint, data=json.dumps(data), headers=headers)
+            response = requests.post(
+                Constants.API_URL.value + endpoint, data=json.dumps(data), headers=headers)
             if self.__check_response_status(response.status_code):
                 break
             tries = tries + 1
@@ -61,49 +63,62 @@ class Protocol:
     def login(self):
         headers = {'Content-Type': 'application/json'}
         data = {'User': 'group4', 'Password': 'HNTS79MA0E'}
-        dictResp = self.__post_request(Constants.ENDPOINT_AUTH_LOGIN.value, headers, data, False)
+        dictResp = self.__post_request(
+            Constants.ENDPOINT_AUTH_LOGIN.value, headers, data, False)
         self.__token = str(dictResp['Token'])
-        self.__logger.log("The following Token is stored:\n" + self.__token, ["Success", "Token"])
+        self.__logger.log("The following Token is stored:\n" +
+                          self.__token, ["Success", "Token"])
 
     def heartbeat(self):
         if self.__token is not None:
-            self.__get_request(Constants.ENDPOINT_DEVICE_HEARTBEAT.value, {}, True, False)
-            self.__logger.log("API Successfully Responded Heartbeat.", ["Success", "Heartbeat"])
+            self.__get_request(
+                Constants.ENDPOINT_DEVICE_HEARTBEAT.value, {}, True, False)
+            self.__logger.log("API Successfully Responded Heartbeat.", [
+                              "Success", "Heartbeat"])
             # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
 
     def can_pickup(self):
         if self.__token is not None:
-            dictResp = self.__get_request(Constants.ENDPOINT_DEVICE_CANPICKUP.value)
+            dictResp = self.__get_request(
+                Constants.ENDPOINT_DEVICE_CANPICKUP.value)
             # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
-            self.__logger.log("API Successfully Responded Can_Pickup:\n" + str(dictResp), ["Success", "Can_Pickup"])
+            self.__logger.log("API Successfully Responded Can_Pickup:\n" +
+                              str(dictResp), ["Success", "Can_Pickup"])
             return dictResp
 
     def picked_up_object(self):
         if self.__token is not None:
-            dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_PICKEDUPOBJECT.value)
-            self.__logger.log("API Successfully Responded Picked_Up_Object:\n" + str(dictResp), ["Success", "Picked_Up_Object"])
+            dictResp = self.__post_request(
+                Constants.ENDPOINT_DEVICE_PICKEDUPOBJECT.value)
+            self.__logger.log("API Successfully Responded Picked_Up_Object:\n" +
+                              str(dictResp), ["Success", "Picked_Up_Object"])
             return dictResp
 
     def put_back_object(self):
         if self.__token is not None:
-            dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_PUTBACKOBJECT.value)
-            self.__logger.log("API Successfully Responded Put_Back_Object:\n" + str(dictResp), ["Success", "Put_Back_Object"])
+            dictResp = self.__post_request(
+                Constants.ENDPOINT_DEVICE_PUTBACKOBJECT.value)
+            self.__logger.log("API Successfully Responded Put_Back_Object:\n" +
+                              str(dictResp), ["Success", "Put_Back_Object"])
             return dictResp
 
     def determined_object(self, color: int):
         if self.__token is not None:
             headers = {'Content-Type': 'application/json'}
             data = {'Color': color}
-            dictResp = self.__post_request(Constants.ENDPOINT_DETERMINED_OBJECT.value, headers, data)
+            dictResp = self.__post_request(
+                Constants.ENDPOINT_DETERMINED_OBJECT.value, headers, data)
             # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
-            self.__logger.log("API Successfully Responded Determined_Object:\n" + str(dictResp), ["Success", "Determined_Object"])
+            self.__logger.log("API Successfully Responded Determined_Object:\n" +
+                              str(dictResp), ["Success", "Determined_Object"])
             return dictResp
 
     def log(self, message: str, tags: list):
         if self.__token is not None:
             headers = {'Content-Type': 'application/json'}
             data = {'Tags': tags, 'Message': message}
-            dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_LOG.value, headers, data)
+            dictResp = self.__post_request(
+                Constants.ENDPOINT_DEVICE_LOG.value, headers, data)
             # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
             return dictResp
 
@@ -111,9 +126,11 @@ class Protocol:
         if self.__token is not None:
             headers = {'Content-Type': 'application/json'}
             data = {'Data': data}
-            dictResp = self.__post_request(Constants.ENDPOINT_DEVICE_SENSORDATA.value, headers, data)
+            dictResp = self.__post_request(
+                Constants.ENDPOINT_DEVICE_SENSORDATA.value, headers, data)
             # check if succes code 200 is return or not. Or maybe checking inside __post_request (errror handler).
-            self.__logger.log("API Successfully Responded Sensor_Data:\n" + str(dictResp), ["Success", "Sensor_Data"])
+            self.__logger.log("API Successfully Responded Sensor_Data:\n" +
+                              str(dictResp), ["Success", "Sensor_Data"])
             return dictResp
 
 
