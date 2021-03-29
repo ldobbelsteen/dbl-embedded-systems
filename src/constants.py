@@ -3,7 +3,7 @@ from enum import Enum
 
 class Constants(Enum):
     # Isolated
-    ISOLATED: bool = True
+    ISOLATED: bool = False
 
     # Protocol API
     API_URL: str = "https://brokenprotocol.xyz"
