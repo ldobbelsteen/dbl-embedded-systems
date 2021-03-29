@@ -105,10 +105,6 @@ class Controller:
                             no_error = False
                             if self.__detect is not None:
                                 detected = self.__detect.detect()
-                                self.__logger.log(
-                                    "Object detection system detected: " + str(self.__detect.detect()))
-                                self.__logger.log(
-                                    "Color detection system detected: " + str(color))
                                 if detected == "white":
                                     if color == 1:
                                         self.__sorting_belt.white()
