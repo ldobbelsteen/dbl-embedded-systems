@@ -130,8 +130,6 @@ class Controller:
 
                                 if self.__protocol is not None:
                                     self.__protocol.picked_up(color)
-                        else:
-                            self.__logger.log("Pickup blocked by the API!")
 
                     # possible shutdown requirement
                     if (datetime.datetime.now() - time_start).seconds >= 180:
