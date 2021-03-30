@@ -2,11 +2,10 @@ from constants import Constants
 from threading import Timer
 from typing import Callable
 import RPi.GPIO as GPIO
-import time
 
 
-def print_panic(pin: int):
-    print("Motor on pin " + str(pin) + " is behaving unexpectedly!")
+def default_panic(pin: int):
+    return pin
 
 
 class Motor:
@@ -26,7 +25,7 @@ class Motor:
             backward_pin: int = -1,
             enable_pin: int = -1,
             vib_sens_pin: int = -1,
-            panic_func: Callable = print_panic,
+            panic_func: Callable = default_panic,
     ):
         self.__running = False
         self.__loaded = (

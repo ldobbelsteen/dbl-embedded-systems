@@ -1,12 +1,7 @@
-import argparse
-import io
-import re
-import time
-
-import numpy as np
-import picamera
-
+from io import BytesIO
 from PIL import Image
+from numpy import squeeze
+from picamera import PiCamera
 from tflite_runtime.interpreter import Interpreter
 from constants import Constants
 
@@ -20,8 +15,7 @@ class Detect:
         if self.__loaded:
             self.__interpreter = Interpreter(model_file)
             self.__interpreter.allocate_tensors()
-            self.__camera = picamera.PiCamera(
-                resolution=(480, 480), framerate=30)
+            self.__camera = PiCamera(resolution=(480, 480), framerate=30)
 
     def set_input_tensor(self, interpreter, image):
         tensor_index = interpreter.get_input_details()[0]['index']
@@ -31,7 +25,7 @@ class Detect:
     def detect(self):
 
         # Take picture
-        stream = io.BytesIO()
+        stream = BytesIO()
         self.__camera.capture(stream, format='jpeg', use_video_port=True)
         stream.seek(0)
         _, input_height, input_width, _ = self.__interpreter.get_input_details()[
@@ -43,7 +37,7 @@ class Detect:
         self.set_input_tensor(self.__interpreter, image)
         self.__interpreter.invoke()
         output_details = self.__interpreter.get_output_details()[0]
-        tensor = np.squeeze(
+        tensor = squeeze(
             self.__interpreter.get_tensor(output_details["index"]))
 
         # Get confidences from tensor
@@ -54,9 +48,8 @@ class Detect:
         # Determine image class with highest confidence
         if no_disk_confidence >= Constants.OBJECT_DETECTION_NONE_THRESHOLD.value:
             return "none"
-        elif white_disk_confidence >= Constants.OBJECT_DETECTION_WHITE_THRESHOLD.value:
+        if white_disk_confidence >= Constants.OBJECT_DETECTION_WHITE_THRESHOLD.value:
             return "white"
-        elif black_disk_confidence >= Constants.OBJECT_DETECTION_BLACK_THRESHOLD.value:
+        if black_disk_confidence >= Constants.OBJECT_DETECTION_BLACK_THRESHOLD.value:
             return "black"
-        else:
-            return "unknown"
+        return "unknown"
