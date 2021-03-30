@@ -21,7 +21,7 @@ class Protocol:
         headers = {'Content-Type': 'application/json'}
         data = {'User': 'group4', 'Password': 'HNTS79MA0E'}
         res = self.__post_request(
-            Constants.ENDPOINT_AUTH_LOGIN.value, headers, data, False)
+            Constants.ENDPOINT_AUTH_LOGIN.value, headers, data)
         self.__token = str(res['Token'])
         self.__logger.log("API login success with token: " + self.__token)
 
