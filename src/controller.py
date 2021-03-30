@@ -12,7 +12,6 @@ import protocol
 import logger
 import switch
 import detect
-import asyncio
 
 
 class Controller:
@@ -81,73 +80,80 @@ class Controller:
         )
 
         try:
-            time_start = datetime.datetime.now()
-            while True:
-                if self.__running:
-                    gate_reading = self.__phototransistor.get_reading(1)
-                    if gate_reading < Constants.LIGHT_GATE_VALUE.value:
-                        if self.__protocol is None or self.__protocol.can_pickup():
-                            self.__color_led.on()
-                            time.sleep(
-                                Constants.GATE_TO_COLOR_INTERVAL_S.value)
-                            color_reading = self.__phototransistor.get_reading(
-                                0)
-                            color = self.__phototransistor.get_color(
-                                color_reading)
-                            self.__color_led.off()
-
-                            detected = self.__detect.detect()
-                            no_error = False
-                            if detected == "white":
-                                if color == 1:
-                                    self.__sorting_belt.white()
-                                    no_error = True
-                                else:
-                                    # log and error handling: light sensor and camera detect differ
-                                    self.__logger.log(
-                                        "Detection discrepancy between object and color detection.")
-                            elif detected == "black":
-                                if color == 0:
-                                    self.__sorting_belt.black()
-                                    no_error = True
-                                else:
-                                    # log and error handling: light sensor and camera detect differ
-                                    self.__logger.log(
-                                        "Detection discrepancy between object and color detection.")
-                            elif detected == "none":
-                                # log and error handling: no object or wrong color
-                                self.__logger.log(
-                                    "No object has been found.")
-                            elif detected == "unknown":
-                                # log and error handling: unknown object
-                                self.__logger.log(
-                                    "The detected object is not a disk.")
-
-                            if no_error:
-                                time.sleep(
-                                    Constants.COLOR_TO_ROBOT_INTERVAL_S.value)
-                                self.__robot.arm_push_off()
-
-                                if self.__protocol is not None:
-                                    self.__protocol.picked_up(color)
-
-                    # possible shutdown requirement
-                    if (datetime.datetime.now() - time_start).seconds >= 180:
-                        break
-
-                time.sleep(Constants.GATE_SENSOR_SENSE_INTERVAL_S.value)
+            self.main()
         finally:
-            self.shutdown()  # shutdown if the controller exits unexpectedly
+            self.shutdown()  # shutdown if the main loop exits unexpectedly
+
+    # Main logic loop
+    def main(self):
+        time_start = datetime.datetime.now()
+        while True:
+            if self.__running:
+                gate_light_value = self.__phototransistor.get_reading(1)
+                gate_is_blocked = gate_light_value <= Constants.LIGHT_GATE_VALUE.value
+                if gate_is_blocked:
+                    can_pickup = self.__protocol is None or self.__protocol.can_pickup()
+                    if can_pickup:
+
+                        # Determine the object's color
+                        self.__color_led.on()
+                        time.sleep(Constants.GATE_TO_COLOR_INTERVAL_S.value)
+                        color_reading = self.__phototransistor.get_reading(0)
+                        color = self.__phototransistor.get_color(color_reading)
+                        self.__color_led.off()
+
+                        # Determine the object's class(es)
+                        detected = self.__detect.detect()
+
+                        # Compare color to class and deal with the result accordingly
+                        no_error = False
+                        if detected == "white":
+                            if color == 1:
+                                self.__sorting_belt.white()
+                                no_error = True
+                            else:
+                                # log and error handling: light sensor and camera detect differ
+                                self.__logger.log(
+                                    "Detection discrepancy between object and color detection!")
+                        elif detected == "black":
+                            if color == 0:
+                                self.__sorting_belt.black()
+                                no_error = True
+                            else:
+                                # log and error handling: light sensor and camera detect differ
+                                self.__logger.log(
+                                    "Detection discrepancy between object and color detection!")
+                        elif detected == "none":
+                            # log and error handling: no object or wrong color
+                            self.__logger.log(
+                                "No object could be found or it has the wrong color!")
+                        elif detected == "unknown":
+                            # log and error handling: unknown object
+                            self.__logger.log(
+                                "The detected object is probably not a disk!")
+
+                        # If no exception was found, push the disk off the belt
+                        if no_error:
+                            time.sleep(
+                                Constants.COLOR_TO_ROBOT_INTERVAL_S.value)
+                            self.__robot.arm_push_off()
+
+                            if self.__protocol is not None:
+                                self.__protocol.picked_up(color)
+
+            # Possible shutdown requirement
+            if (datetime.datetime.now() - time_start).seconds >= 180:
+                break
+
+            # Wait before sensing the gate again
+            time.sleep(Constants.GATE_SENSOR_SENSE_INTERVAL_S.value)
 
     # Callback to run when the main switch is pressed
     def switch_main(self, channel):
         if not self.__running:
             self.startup()
-            time.sleep(0.1)  # wait for gate light to turn on
-            self.__running = True
         else:
             self.shutdown()
-            self.__running = False
 
     # Method to run when a motor behaves unexpectedly
     def motor_panic(self, pin):
@@ -162,6 +168,8 @@ class Controller:
         self.__robot.arm_move_back()
         self.__main_belt.forward(Constants.MAIN_BELT_MOTOR_POWER.value)
         self.__sorting_belt.white()
+        time.sleep(0.1)  # wait for gate light to turn on
+        self.__running = True
 
     # Stop functionality
     def standby(self):
