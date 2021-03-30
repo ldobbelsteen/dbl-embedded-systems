@@ -2,7 +2,6 @@ from constants import Constants
 from threading import Timer
 from typing import Callable
 import RPi.GPIO as GPIO
-import time
 
 
 def print_panic(pin: int):
