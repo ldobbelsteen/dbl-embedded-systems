@@ -1,9 +1,7 @@
-import requests
 import json
 import time
-import logger
+import requests
 from threading import Timer
-from datetime import datetime
 from constants import Constants
 
 
@@ -25,11 +23,11 @@ class Protocol:
         res = self.__post_request(
             Constants.ENDPOINT_AUTH_LOGIN.value, headers, data, False)
         self.__token = str(res['Token'])
+        self.__logger.log("API login success with token: " + self.__token)
 
     # Send heartbeat and keep doing so
     def heartbeat(self):
-        self.__get_request(
-            Constants.ENDPOINT_DEVICE_HEARTBEAT.value, {}, True, False)
+        self.__get_request(Constants.ENDPOINT_DEVICE_HEARTBEAT.value)
         Timer(4, self.heartbeat).start()
 
     # Keep checking if next disk can be picked up until it can
@@ -59,53 +57,40 @@ class Protocol:
         data = {'Tags': tags, 'Message': message}
         res = self.__post_request(
             Constants.ENDPOINT_DEVICE_LOG.value, headers, data)
-        # check if success code 200 is returned or not. Or maybe checking inside __post_request (error handler)
         return res
 
+    # Check HTTP response code for errors
     def __check_response_status(self, status_code: int):
-        # here error handler
-        # switch case (disctResp['statuscode'])
-        # case 200: Succes
-        # case 400: Return error to log (Terminal + API log)
         if status_code == 401:
             self.login()
-        return True if status_code == 200 else False
+        return status_code == 200
 
-    def __get_request(self, endpoint, headers: dict = {}, bool_token: bool = True, returned: bool = True):
-        if bool_token and self.__token is not None:
-            headers['auth'] = self.__token
-
-        tries = 0
-        while tries < 20:
-            response = requests.get(
-                Constants.API_URL.value + endpoint, headers=headers)
-            if self.__check_response_status(response.status_code):
-                break
-            tries = tries + 1
-            time.sleep(0.5)
-
-        if returned:
-            dictResp = json.loads(response.text)
-            # todo-> Check status code before returning (error handling) 200 good, but when it returns lik 400 then it is
-            #  error.
-            return dictResp
-
-    def __post_request(self, endpoint, headers: dict = {}, data: dict = {}, bool_token: bool = True):
-        # Adding auth automatically in order to avoid repititve code, since token is always required by post except
-        # one case.
-        if bool_token and self.__token is not None:
-            headers['auth'] = self.__token
+    # Send a GET request to the API
+    def __get_request(self, endpoint, headers: dict = {}):
+        headers["auth"] = self.__token
 
         tries = 0
         while tries < 20:
-            response = requests.post(
-                Constants.API_URL.value + endpoint, data=json.dumps(data), headers=headers)
-            if self.__check_response_status(response.status_code):
+            res = requests.get(Constants.API_URL.value +
+                               endpoint, headers=headers)
+            if self.__check_response_status(res.status_code):
                 break
-            tries = tries + 1
-            time.sleep(0.5)
+            tries += 1
+            time.sleep(0.2)
 
-        dictResp = json.loads(response.text)
-        # todo-> Check status code before returning (error handling) 200 good, but when it returns lik 400 then it is
-        #  error.
-        return dictResp
+        return json.loads(res.text)
+
+    # Send a POST request to the API
+    def __post_request(self, endpoint, headers: dict = {}, data: dict = {}):
+        headers["auth"] = self.__token
+
+        tries = 0
+        while tries < 20:
+            res = requests.post(Constants.API_URL.value +
+                                endpoint, data=json.dumps(data), headers=headers)
+            if self.__check_response_status(res.status_code):
+                break
+            tries += 1
+            time.sleep(0.2)
+
+        return json.loads(res.text)
