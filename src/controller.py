@@ -79,6 +79,8 @@ class Controller:
             bouncetime=Constants.MAIN_SWITCH_DEBOUNCE_MS.value
         )
 
+        self.__logger.log("Controller class initialized.", ["Controller"])
+
         try:
             self.run()
         finally:
@@ -92,8 +94,10 @@ class Controller:
                 gate_light_value = self.__phototransistor.get_reading(7)
                 gate_is_blocked = gate_light_value <= Constants.LIGHT_GATE_VALUE.value
                 if gate_is_blocked:
+                    self.__logger.log("An object has been detected.", ["Robot"])
                     can_pickup = self.__protocol is None or self.__protocol.can_pickup()
                     if can_pickup:
+                        self.__logger.log("Permission to pickup object has been received.", ["Protocol"])
 
                         # Determine the object's color
                         self.__color_led.on()
@@ -102,8 +106,12 @@ class Controller:
                         color = self.__phototransistor.get_color(color_reading)
                         self.__color_led.off()
 
+                        self.__logger.log("Color has been determined.", ["Robot"])
+
                         # Determine the object's class(es)
                         detected = self.__detect.detect()
+
+                        self.__logger.log("Object has been determined.", ["Robot"])
 
                         # Compare color to class and deal with the result accordingly
                         no_error = False
@@ -111,38 +119,43 @@ class Controller:
                             if color == 1:
                                 self.__sorting_belt.white()
                                 no_error = True
+                                self.__logger.log("Object has been confirmed as white disk.", ["Robot"])
                             else:
                                 # log and error handling: light sensor and camera detect differ
                                 self.__logger.log(
-                                    "Detection discrepancy between object and color detection!")
+                                    "Detection discrepancy between object and color detection!", ["Fault"])
                         elif detected == "black":
                             if color == 0:
                                 self.__sorting_belt.black()
                                 no_error = True
+                                self.__logger.log("Object has been confirmed as black disk.", ["Robot"])
                             else:
                                 # log and error handling: light sensor and camera detect differ
                                 self.__logger.log(
-                                    "Detection discrepancy between object and color detection!")
+                                    "Detection discrepancy between object and color detection!", ["Fault"])
                         elif detected == "none":
                             # log and error handling: no object or wrong color
                             self.__logger.log(
-                                "No object could be found or it has the wrong color!")
+                                "No object could be found or it has the wrong color!", ["Fault"])
                         elif detected == "unknown":
                             # log and error handling: unknown object
                             self.__logger.log(
-                                "The detected object is probably not a disk!")
+                                "The detected object is probably not a disk!", ["Fault"])
 
                         # If no exception was found, push the disk off the belt
                         if no_error:
                             time.sleep(
                                 Constants.COLOR_TO_ROBOT_INTERVAL_S.value)
                             self.__robot.arm_push_off()
+                            self.__logger.log("Disk is being pushed off.", ["Robot"])
 
                             if self.__protocol is not None:
                                 self.__protocol.picked_up(color)
 
             # Possible shutdown requirement
-            if (datetime.datetime.now() - time_start).seconds >= 180:
+            if (datetime.datetime.now() - time_start).seconds >= Constants.ROBOT_RUNNING_S.value:
+                self.__logger.log("Robot has reached running time limit of " + str(Constants.ROBOT_RUNNING_S.value)
+                                  + " seconds and will shutdown now.", ["System"])
                 break
 
             # Wait before sensing the gate again
@@ -151,15 +164,22 @@ class Controller:
     # Callback to run when the main switch is pressed
     def switch_main(self, channel):
         if not self.__running:
+            self.__logger.log("Starting up system...", ["System"])
             self.startup()
+            self.__logger.log("System is started up.", ["System"])
         else:
+            self.__logger.log("Shutdown system...", ["System"])
             self.shutdown()
+            self.__logger.log("System has shutdown.", ["System"])
 
     # Method to run when a motor behaves unexpectedly
     def motor_panic(self, pin):
         self.__logger.log("Motor on pin " + str(pin) +
-                          " is behaving unexpectedly! Disabling functionality...")
+                          " is behaving unexpectedly!", ["Fault"])
+        self.__logger.log("System going in standby mode...", ["System"])
         self.standby()
+        self.__logger.log("System is in standby mode.", ["System"])
+        self.__logger.log("For recovery: fix the motor on pin " + str(pin) + " and press the main switch.", ["Fault recovery"])
 
     # Start functionality
     def startup(self):

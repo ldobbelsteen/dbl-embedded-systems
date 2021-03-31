@@ -23,6 +23,7 @@ class Constants(Enum):
     BLACK_RANGE_END: int = 80
 
     # General timings
+    ROBOT_RUNNING_S: int = 180
     MAIN_SWITCH_DEBOUNCE_MS: int = 500
     ROBOT_SWITCH_DEBOUNCE_MS: int = 300
     VIB_SENSOR_DEBOUNCE_MS: int = 200

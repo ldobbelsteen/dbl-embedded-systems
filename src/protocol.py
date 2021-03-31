@@ -28,10 +28,12 @@ class Protocol:
     # Send heartbeat and keep doing so
     def heartbeat(self):
         self.__get_request(Constants.ENDPOINT_DEVICE_HEARTBEAT.value)
+        self.__logger.log("Heartbeat has been send to the protocol.", ["Protocol"])
         Timer(4, self.heartbeat).start()
 
     # Keep checking if next disk can be picked up until it can
     def pickup_check(self):
+        self.__logger.log("Asking the protocol for permission to pick up an object.", ["Protocol"])
         self.__pickup_next = self.__get_request(
             Constants.ENDPOINT_DEVICE_CANPICKUP.value)
         if not self.__pickup_next:
@@ -43,12 +45,14 @@ class Protocol:
 
     # Send that disk of color has been picked up
     def picked_up(self, color: int):
+        self.__logger.log("Informing protocol that a disk is being picked up...", ["Protocol"])
         self.__post_request(Constants.ENDPOINT_DEVICE_PICKEDUPOBJECT.value)
         headers = {'Content-Type': 'application/json'}
         data = {'Color': color}
         self.__post_request(
             Constants.ENDPOINT_DETERMINED_OBJECT.value, headers, data)
         self.__pickup_next = False
+        self.__logger.log("Protocol has been informed about a disk being picked up.", ["Protocol"])
         self.pickup_check()
 
     # Send a log with tags to the protocol
