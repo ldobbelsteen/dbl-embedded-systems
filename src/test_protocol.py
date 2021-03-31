@@ -15,5 +15,11 @@ class TestProtocol(TestCase):
         # finally:
         #     print("yes")
 
-    def test_canPickup(self):
-        self.__protocol.can_pickup()
+    def test_log(self):
+        self.__protocol.login()
+        assert (self.__protocol.log("Test", ['Test']))
+
+
+    # def test_canPickup(self):
+    #     result = self.__protocol.can_pickup()
+    #     assert ((result == True) or (result == False))
