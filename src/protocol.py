@@ -79,10 +79,10 @@ class Protocol:
                 break
             tries += 1
             time.sleep(0.2)
-        
+
         try:
             return json.loads(res.text)
-        except:
+        except Exception:
             return
 
     # Send a POST request to the API
@@ -104,5 +104,5 @@ class Protocol:
 
         try:
             return json.loads(res.text)
-        except:
+        except Exception:
             return
