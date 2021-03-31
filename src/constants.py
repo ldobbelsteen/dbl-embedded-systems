@@ -16,7 +16,7 @@ class Constants(Enum):
     ENDPOINT_DEVICE_SENSORDATA: str = "/Device/SensorData"
 
     # Brightness values/ranges
-    LIGHT_GATE_VALUE: int = 250
+    LIGHT_GATE_VALUE: int = 500
     WHITE_RANGE_START: int = 100
     WHITE_RANGE_END: int = 300
     BLACK_RANGE_START: int = 20
@@ -27,7 +27,7 @@ class Constants(Enum):
     ROBOT_SWITCH_DEBOUNCE_MS: int = 300
     VIB_SENSOR_DEBOUNCE_MS: int = 300
     VIB_SENSOR_CHECK_COUNT: int = 40
-    GATE_SENSOR_SENSE_INTERVAL_S: float = 0.05
+    GATE_SENSOR_SENSE_INTERVAL_S: float = 0.1
     GATE_TO_COLOR_INTERVAL_S: float = 0.18
     COLOR_TO_ROBOT_INTERVAL_S: float = 0.05
 
