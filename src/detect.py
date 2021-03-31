@@ -17,7 +17,7 @@ class Detect:
             self.__interpreter.allocate_tensors()
             self.__camera = PiCamera(resolution=(480, 480), framerate=30)
 
-    def set_input_tensor(self, interpreter, image):
+    def __set_input_tensor(self, interpreter, image):
         tensor_index = interpreter.get_input_details()[0]['index']
         input_tensor = interpreter.tensor(tensor_index)()[0]
         input_tensor[:, :] = image
@@ -34,7 +34,7 @@ class Detect:
             (input_width, input_height), Image.ANTIALIAS)
 
         # Run detection
-        self.set_input_tensor(self.__interpreter, image)
+        self.__set_input_tensor(self.__interpreter, image)
         self.__interpreter.invoke()
         output_details = self.__interpreter.get_output_details()[0]
         tensor = squeeze(

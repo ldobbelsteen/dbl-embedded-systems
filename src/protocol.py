@@ -66,7 +66,9 @@ class Protocol:
         return status_code == 200
 
     # Send a GET request to the API
-    def __get_request(self, endpoint, headers: dict = {}):
+    def __get_request(self, endpoint, headers=None):
+        if headers is None:
+            headers = {}
         headers["auth"] = self.__token
 
         tries = 0
@@ -81,7 +83,11 @@ class Protocol:
         return json.loads(res.text)
 
     # Send a POST request to the API
-    def __post_request(self, endpoint, headers: dict = {}, data: dict = {}):
+    def __post_request(self, endpoint, headers=None, data=None):
+        if data is None:
+            data = {}
+        if headers is None:
+            headers = {}
         headers["auth"] = self.__token
 
         tries = 0

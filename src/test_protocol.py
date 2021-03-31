@@ -6,7 +6,7 @@ class TestProtocol:
     __protocol = protocol.Protocol
 
     def test_login(self):
-        result = self.__protocol.login(self)
+        result = self.__protocol.login()
         print(result)
         assert (result is not None) and (result != "")
 

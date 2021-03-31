@@ -6,7 +6,9 @@ from constants import Constants
 class Logger:
     __protocol = None
 
-    def log(self, message: str, tags: list = []):
+    def log(self, message: str, tags: list = None):
+        if tags is None:
+            tags = []
         logs = ''
         message = str(datetime.datetime.now()) + ": " + message
         if len(tags) > 0:

@@ -80,12 +80,12 @@ class Controller:
         )
 
         try:
-            self.main()
+            self.run()
         finally:
             self.shutdown()  # shutdown if the main loop exits unexpectedly
 
     # Main logic loop
-    def main(self):
+    def run(self):
         time_start = datetime.datetime.now()
         while True:
             if self.__running:
