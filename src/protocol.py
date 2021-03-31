@@ -79,8 +79,11 @@ class Protocol:
                 break
             tries += 1
             time.sleep(0.2)
-
-        return json.loads(res.text)
+        
+        try:
+            return json.loads(res.text)
+        except:
+            return
 
     # Send a POST request to the API
     def __post_request(self, endpoint, headers=None, data=None):
@@ -99,4 +102,7 @@ class Protocol:
             tries += 1
             time.sleep(0.2)
 
-        return json.loads(res.text)
+        try:
+            return json.loads(res.text)
+        except:
+            return

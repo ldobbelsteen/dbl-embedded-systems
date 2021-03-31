@@ -89,7 +89,7 @@ class Controller:
         time_start = datetime.datetime.now()
         while True:
             if self.__running:
-                gate_light_value = self.__phototransistor.get_reading(1)
+                gate_light_value = self.__phototransistor.get_reading(7)
                 gate_is_blocked = gate_light_value <= Constants.LIGHT_GATE_VALUE.value
                 if gate_is_blocked:
                     can_pickup = self.__protocol is None or self.__protocol.can_pickup()
@@ -98,7 +98,7 @@ class Controller:
                         # Determine the object's color
                         self.__color_led.on()
                         time.sleep(Constants.GATE_TO_COLOR_INTERVAL_S.value)
-                        color_reading = self.__phototransistor.get_reading(0)
+                        color_reading = self.__phototransistor.get_reading(6)
                         color = self.__phototransistor.get_color(color_reading)
                         self.__color_led.off()
 
