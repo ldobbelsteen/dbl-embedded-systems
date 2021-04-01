@@ -56,7 +56,7 @@ class Protocol:
         self.pickup_check()
 
     def log(self, message: str, tags: list):
-        Timer(0, self.__log_protocol(message, tags))
+        Timer(0, self.__log_protocol(message, tags)).start()
 
     # Send a log with tags to the protocol
     def __log_protocol(self, message: str, tags: list):
