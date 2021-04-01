@@ -55,8 +55,11 @@ class Protocol:
         self.__logger.log("Protocol has been informed about a disk being picked up.", ["Protocol"])
         self.pickup_check()
 
-    # Send a log with tags to the protocol
     def log(self, message: str, tags: list):
+        Timer(0, self.__log_protocol(message, tags))
+
+    # Send a log with tags to the protocol
+    def __log_protocol(self, message: str, tags: list):
         headers = {'Content-Type': 'application/json'}
         data = {'Tags': tags, 'Message': message}
         res = self.__post_request(
