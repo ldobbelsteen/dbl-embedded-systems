@@ -26,16 +26,20 @@ class Robot:
             bouncetime=Constants.ROBOT_SWITCH_DEBOUNCE_MS.value,
         )
 
+    # Moves the robot arm to the push-off position
     def arm_push_off(self):
         self.__motor.change(True, Constants.ROBOT_MOTOR_POWER.value)
 
+    # Moves the robot arm to initial position
     def arm_move_back(self):
         if not self.__switch_start.pressed():
             self.__motor.change(False, Constants.ROBOT_MOTOR_POWER.value)
 
+    # Moves arm back to initial position after push-off position has been reached
     def arm_arrived(self, channel):
         self.__motor.stop()
         self.arm_move_back()
 
+    # Stops arm when initial position is reached
     def arm_back(self, channel):
         self.__motor.stop()

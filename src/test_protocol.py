@@ -6,20 +6,15 @@ from src import logger
 class TestProtocol(TestCase):
     __protocol = protocol.Protocol(logger.Logger())
 
+    # Test case, login function protocol
     def test_login(self):
         try:
             self.__protocol.login()
             assert True
-        except:
+        except Exception:
             assert False
-        # finally:
-        #     print("yes")
 
+    # Test case, log function protocol
     def test_log(self):
         self.__protocol.login()
         assert (self.__protocol.log("Test", ['Test']))
-
-
-    # def test_canPickup(self):
-    #     result = self.__protocol.can_pickup()
-    #     assert ((result == True) or (result == False))

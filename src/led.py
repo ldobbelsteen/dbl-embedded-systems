@@ -13,10 +13,12 @@ class Led:
         if self.__loaded:
             GPIO.setup(led_pin, GPIO.OUT)
 
+    # Puts the led on
     def on(self):
         if self.__loaded:
             GPIO.output(self.__led_pin, 1)
 
+    # Puts the led off
     def off(self):
         if self.__loaded:
             GPIO.output(self.__led_pin, 0)

@@ -76,6 +76,7 @@ class Motor:
             else:
                 Timer(i * chunk, check_stable).start()
 
+    # Change the direction and power of the motor movement
     def change(self, forward: bool, power: int):
         if self.__loaded:
             power = self.__power_check(power)
@@ -84,11 +85,13 @@ class Motor:
             GPIO.output(self.__backward_pin, not forward)
             self.__start(power)
 
+    # Start functionality
     def __start(self, power):
         if self.__loaded:
             self.__running = True
             self.__pwm.start(power)
 
+    # Stop functionality
     def stop(self):
         if self.__loaded:
             self.__running = False

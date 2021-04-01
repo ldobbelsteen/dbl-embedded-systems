@@ -10,6 +10,7 @@ class Switch:
             self.__input_pin = input_pin
             GPIO.setup(self.__input_pin, GPIO.IN)
 
+    # Returns whether switch is pressed
     def pressed(self):
         if self.__loaded:
             return GPIO.input(self.__input_pin) == GPIO.HIGH

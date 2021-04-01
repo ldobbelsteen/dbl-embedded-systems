@@ -87,7 +87,7 @@ class Controller:
         try:
             self.run()
         finally:
-            self.shutdown()  # shutdown if the main loop exits unexpectedly
+            self.shutdown()  # shutdown if the main loop exits normally or unexpectedly
 
     # Main logic loop
     def run(self):

@@ -1,11 +1,11 @@
 # log message printer in the terminal & sender to the API.
 import datetime
-from constants import Constants
 
 
 class Logger:
-    __protocol = None
+    __protocol = None  # Protocol used for logging
 
+    # Logs a message with certain tags
     def log(self, message: str, tags: list = None):
         if tags is None:
             tags = []

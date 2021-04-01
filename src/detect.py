@@ -23,7 +23,6 @@ class Detect:
         input_tensor[:, :] = image
 
     def detect(self):
-
         # Take picture
         stream = BytesIO()
         self.__camera.capture(stream, format='jpeg', use_video_port=True)
