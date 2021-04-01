@@ -1,3 +1,5 @@
+# This class is used to make sequences of pictures with the Raspberry Pi Camera at once, 
+# such that we pull it through github to on our local machine, and afterwards redirect
 from uuid import uuid4
 from time import sleep
 from pathlib import Path

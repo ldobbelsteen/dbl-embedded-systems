@@ -1,3 +1,4 @@
+# Detect Class which is works as the Object Detection using the hardware PiCamera V1.3, is Build on top of the basis retrieved through Tensorflow official github, we bould this class: https://github.com/tensorflow/examples/blob/master/lite/examples/object_detection/raspberry_pi/detect_picamera.py (important: The Model retrieving is different, since we use a custom generated model from TeachableMachine, Google)
 from io import BytesIO
 from PIL import Image
 from numpy import squeeze
@@ -17,11 +18,13 @@ class Detect:
             self.__interpreter.allocate_tensors()
             self.__camera = PiCamera(resolution=(480, 480), framerate=30)
 
+    # Sets the input tensor
     def __set_input_tensor(self, interpreter, image):
         tensor_index = interpreter.get_input_details()[0]['index']
         input_tensor = interpreter.tensor(tensor_index)()[0]
         input_tensor[:, :] = image
-
+    
+    # Returns if any object is detected using the PiCamera and the model provided in /object_detection.tflite.
     def detect(self):
         # Take picture
         stream = BytesIO()
@@ -32,7 +35,7 @@ class Detect:
         image = Image.open(stream).convert('RGB').resize(
             (input_width, input_height), Image.ANTIALIAS)
 
-        # Run detection
+        # Run detection + retrieving the output tensor at the given index.
         self.__set_input_tensor(self.__interpreter, image)
         self.__interpreter.invoke()
         output_details = self.__interpreter.get_output_details()[0]
