@@ -112,7 +112,7 @@ class Controller:
                         self.__color_led.off()
 
                         self.__logger.log(
-                            "Color has been determined to be " + color, ["Robot"])
+                            "Color has been determined to be " + str(color), ["Robot"])
 
                         # Determine the object's class
                         if self.__detect is not None:
