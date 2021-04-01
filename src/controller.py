@@ -66,7 +66,10 @@ class Controller:
         )
         self.__logger = logger.Logger()
         self.__main_switch = switch.Switch(Constants.MAIN_SWITCH_PIN.value)
-        self.__detect = detect.Detect(Constants.OBJECT_DETECTION_MODEL.value)
+
+        if Constants.OBJECT_DETECTION_ENABLE.value:
+            self.__detect = detect.Detect(
+                Constants.OBJECT_DETECTION_MODEL.value)
 
         if Constants.USE_API.value:
             self.__protocol = protocol.Protocol(self.__logger)
@@ -94,10 +97,12 @@ class Controller:
                 gate_light_value = self.__phototransistor.get_reading(7)
                 gate_is_blocked = gate_light_value <= Constants.LIGHT_GATE_VALUE.value
                 if gate_is_blocked:
-                    self.__logger.log("An object has been detected.", ["Robot"])
+                    self.__logger.log(
+                        "An object has been detected.", ["Robot"])
                     can_pickup = self.__protocol is None or self.__protocol.can_pickup()
                     if can_pickup:
-                        self.__logger.log("Permission to pickup object has been received.", ["Protocol"])
+                        self.__logger.log(
+                            "Permission to pickup object has been received.", ["Protocol"])
 
                         # Determine the object's color
                         self.__color_led.on()
@@ -106,12 +111,22 @@ class Controller:
                         color = self.__phototransistor.get_color(color_reading)
                         self.__color_led.off()
 
-                        self.__logger.log("Color has been determined.", ["Robot"])
+                        self.__logger.log(
+                            "Color has been determined.", ["Robot"])
 
-                        # Determine the object's class(es)
-                        detected = self.__detect.detect()
+                        # Determine the object's class
+                        if self.__detect is not None:
+                            detected = self.__detect.detect()
+                        else:
+                            if color == 1:
+                                detected = "white"
+                            if color == 0:
+                                detected = "black"
+                            if color == -1:
+                                detected = "unknown"
 
-                        self.__logger.log("Object has been determined.", ["Robot"])
+                        self.__logger.log(
+                            "Object has been determined.", ["Robot"])
 
                         # Compare color to class and deal with the result accordingly
                         no_error = False
@@ -119,7 +134,8 @@ class Controller:
                             if color == 1:
                                 self.__sorting_belt.white()
                                 no_error = True
-                                self.__logger.log("Object has been confirmed as white disk.", ["Robot"])
+                                self.__logger.log(
+                                    "Object has been confirmed as white disk.", ["Robot"])
                             else:
                                 # log and error handling: light sensor and camera detect differ
                                 self.__logger.log(
@@ -128,7 +144,8 @@ class Controller:
                             if color == 0:
                                 self.__sorting_belt.black()
                                 no_error = True
-                                self.__logger.log("Object has been confirmed as black disk.", ["Robot"])
+                                self.__logger.log(
+                                    "Object has been confirmed as black disk.", ["Robot"])
                             else:
                                 # log and error handling: light sensor and camera detect differ
                                 self.__logger.log(
@@ -147,7 +164,8 @@ class Controller:
                             time.sleep(
                                 Constants.COLOR_TO_ROBOT_INTERVAL_S.value)
                             self.__robot.arm_push_off()
-                            self.__logger.log("Disk is being pushed off.", ["Robot"])
+                            self.__logger.log(
+                                "Disk is being pushed off.", ["Robot"])
 
                             if self.__protocol is not None:
                                 self.__protocol.picked_up(color)
@@ -179,7 +197,8 @@ class Controller:
         self.__logger.log("System going in standby mode...", ["System"])
         self.standby()
         self.__logger.log("System is in standby mode.", ["System"])
-        self.__logger.log("For recovery: fix the motor on pin " + str(pin) + " and press the main switch.", ["Fault recovery"])
+        self.__logger.log("For recovery: fix the motor on pin " +
+                          str(pin) + " and press the main switch.", ["Fault recovery"])
 
     # Start functionality
     def startup(self):

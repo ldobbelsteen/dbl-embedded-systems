@@ -58,6 +58,7 @@ class Constants(Enum):
     MAIN_SWITCH_PIN: int = 22
 
     # Object detection
+    OBJECT_DETECTION_ENABLE: bool = True
     OBJECT_DETECTION_MODEL: str = "./object_detection/model.tflite"
     OBJECT_DETECTION_WHITE_THRESHOLD: float = 0.7
     OBJECT_DETECTION_BLACK_THRESHOLD: float = 0.7
