@@ -1,7 +1,7 @@
 import json
 import time
 import requests
-from threading import Timer
+import threading
 from constants import Constants
 
 
@@ -30,7 +30,7 @@ class Protocol:
         self.__get_request(Constants.ENDPOINT_DEVICE_HEARTBEAT.value)
         self.__logger.log(
             "Heartbeat has been send to the protocol.", ["Protocol"])
-        Timer(4, self.heartbeat).start()
+        threading.Timer(4, self.heartbeat).start()
 
     # Keep checking if next disk can be picked up until it can
     def pickup_check(self):
@@ -39,7 +39,7 @@ class Protocol:
         self.__pickup_next = self.__get_request(
             Constants.ENDPOINT_DEVICE_CANPICKUP.value)
         if not self.__pickup_next:
-            Timer(1, self.pickup_check).start()
+            threading.Timer(1, self.pickup_check).start()
 
     # Check if disk can be picked up right now
     def can_pickup(self):
@@ -59,18 +59,15 @@ class Protocol:
             "Protocol has been informed about a disk being picked up.", ["Protocol"])
         self.pickup_check()
 
-    def log(self, message: str, tags: list):
-        Timer(0, self.__log_protocol(message, tags)).start()
-
     # Send a log with tags to the protocol
-    def __log_protocol(self, message: str, tags: list):
+    def log(self, message: str, tags: list):
         headers = {'Content-Type': 'application/json'}
         data = {'Tags': tags, 'Message': message}
 
         def post_log():
             self.__post_request(
                 Constants.ENDPOINT_DEVICE_LOG.value, headers, data)
-        Timer(0, post_log).start()
+        threading.Timer(0, post_log).start()
 
     # Check HTTP response code for errors
     def __check_response_status(self, status_code: int):
